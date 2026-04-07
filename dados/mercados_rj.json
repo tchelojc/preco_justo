@@ -1,17 +1,5 @@
 [
   {
-    "id": "prezunic",
-    "nome": "Prezunic",
-    "logo": "🛒",
-    "cor": "#E31E26",
-    "base_url": "https://www.prezunic.com.br",
-    "busca_url_template": "/{TERMO}?_q={TERMO}&map=ft",
-    "container_produto": ".vtex-product-summary",
-    "json_ld_esperado": true,
-    "plataforma": "vtex",
-    "ativo": true
-  },
-  {
     "id": "mundial",
     "nome": "Mundial",
     "logo": "🏪",
@@ -40,11 +28,11 @@
     "nome": "Super Market",
     "logo": "🏬",
     "cor": "#006400",
-    "base_url": "https://www.superseis.com.br",
+    "base_url": "https://www.sitemercado.com.br/supermarket",
     "busca_url_template": "/busca?q={TERMO}",
-    "container_produto": ".product-card",
+    "container_produto": "[data-product-id]",
     "json_ld_esperado": true,
-    "plataforma": "loja_integrada",
+    "plataforma": "sitemercado",
     "ativo": true
   },
   {
@@ -72,51 +60,39 @@
     "ativo": true
   },
   {
-    "id": "armazem_urbano",
-    "nome": "Armazém Urbano",
-    "logo": "🏙️",
-    "cor": "#8B4513",
-    "base_url": "https://www.armazemurbano.com.br",
+    "id": "atacadao",
+    "nome": "Atacadão",
+    "logo": "📦",
+    "cor": "#FFD700",
+    "base_url": "https://www.atacadao.com.br",
     "busca_url_template": "/busca?q={TERMO}",
-    "container_produto": ".product-card",
+    "container_produto": ".vtex-product-summary",
     "json_ld_esperado": true,
     "plataforma": "vtex",
     "ativo": true
+  },
+  {
+    "id": "prezunic",
+    "nome": "Prezunic",
+    "logo": "🛒",
+    "cor": "#E31E26",
+    "base_url": "https://www.prezunic.com.br",
+    "busca_url_template": "/{TERMO}?_q={TERMO}&map=ft",
+    "container_produto": ".vtex-product-summary",
+    "json_ld_esperado": true,
+    "plataforma": "vtex",
+    "ativo": false
   },
   {
     "id": "rede_economia",
     "nome": "Rede Economia",
     "logo": "💰",
     "cor": "#FFD700",
-    "base_url": "https://www.redeeconomia.com.br",
+    "base_url": "https://www.redeconomia.com.br",
     "busca_url_template": "/busca?q={TERMO}",
     "container_produto": ".produto",
     "json_ld_esperado": false,
     "plataforma": "custom",
-    "ativo": true
-  },
-  {
-    "id": "supercompras",
-    "nome": "Super Compras",
-    "logo": "🛒",
-    "cor": "#4169E1",
-    "base_url": "https://www.sitemercado.com.br/supercompras",
-    "busca_url_template": "/busca?q={TERMO}",
-    "container_produto": "[data-product-id]",
-    "json_ld_esperado": true,
-    "plataforma": "sitemercado",
-    "ativo": true
-  },
-  {
-    "id": "vianense",
-    "nome": "Vianense",
-    "logo": "🏪",
-    "cor": "#800080",
-    "base_url": "https://www.sitemercado.com.br/vianense",
-    "busca_url_template": "/busca?q={TERMO}",
-    "container_produto": "[data-product-id]",
-    "json_ld_esperado": true,
-    "plataforma": "sitemercado",
-    "ativo": true
+    "ativo": false
   }
 ]
