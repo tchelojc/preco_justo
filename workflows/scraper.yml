@@ -2,8 +2,9 @@ name: 🛒 Atualizar Preços — Supermercados RJ
 
 on:
   schedule:
-    # Executa a cada 6 horas: meia-noite, 6h, 12h e 18h (horário UTC = BRT-3)
-    - cron: '0 3,9,15,21 * * *'
+    # Executa às 8h e 16h no horário de Brasília (BRT)
+    # Convertido para UTC: 11h e 19h
+    - cron: '0 11,19 * * *'
   
   # Permite executar manualmente pela aba Actions do GitHub
   workflow_dispatch:
