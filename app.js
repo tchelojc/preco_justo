@@ -9,7 +9,7 @@
  * =============================================================
  */
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzvry4KNcqi396n64NrJk_am9_-XO4wZaaONQRfT8Umyc9yZ_txtQ9pWGCUbjLFRNITHg/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAvPEyw-3ziOOahKMzxrAD_LiiOAkryCbBZxb34Ga-4wH814uHgk8Lc-uowkUhT0N5Q/exec';
 
 // Fallback direto no GitHub (caso GAS esteja fora ou em deploy novo)
 const GITHUB_RAW = 'https://raw.githubusercontent.com/tchelojc/preco_justo/main/dados';
