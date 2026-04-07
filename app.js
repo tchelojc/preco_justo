@@ -9,6 +9,7 @@
  * =============================================================
  */
 
+// Use EXATAMENTE a URL que você acabou de testar
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAvPEyw-3ziOOahKMzxrAD_LiiOAkryCbBZxb34Ga-4wH814uHgk8Lc-uowkUhT0N5Q/exec';
 
 // Fallback direto no GitHub (caso GAS esteja fora ou em deploy novo)
