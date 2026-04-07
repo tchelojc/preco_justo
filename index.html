@@ -139,16 +139,6 @@
       border-color: var(--amarelo);
     }
     
-    .btn-header-primary {
-      background: var(--amarelo);
-      border-color: var(--amarelo);
-      color: var(--verde-esc);
-    }
-    
-    .btn-header-primary:hover {
-      background: #FFE44D;
-    }
-    
     /* Faixa de Mercados */
     .mercados-strip {
       background: var(--verde-esc);
@@ -555,9 +545,8 @@
   </div>
 </footer>
 
-<script src="app.js"></script>
 <script>
-  // ========== CONFIGURAÇÃO ==========
+  // ========== CONFIGURAÇÃO (ÚNICA declaração) ==========
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAvPEyw-3ziOOahKMzxrAD_LiiOAkryCbBZxb34Ga-4wH814uHgk8Lc-uowkUhT0N5Q/exec';
   
   let todosProdutos = [];
@@ -612,7 +601,7 @@
       </div>
     `;
     
-    // Buscar preços para os primeiros 12 produtos (para performance)
+    // Buscar preços para os primeiros 30 produtos
     const produtosParaBuscar = todosProdutos.slice(0, 30);
     
     for (const produto of produtosParaBuscar) {
@@ -715,7 +704,7 @@
                     <div class="melhor-preco-valor">
                       R$ ${precoData.preco.toFixed(2).replace('.', ',')}
                     </div>
-                    <div class="melhor-preco-unidade" style="font-size:0.75rem; color: var(--texto-medio);">
+                    <div style="font-size:0.75rem; color: var(--texto-medio); margin-top: 4px;">
                       R$ ${precoData.preco_por_unidade?.toFixed(2).replace('.', ',')}/${produto.unidade_medida || 'kg'}
                     </div>
                     <div class="melhor-preco-mercado">
