@@ -1,0 +1,137 @@
+[
+  {
+    "id": "arroz_tipo1_5kg",
+    "categoria": "Arroz",
+    "nome_canonico": "Arroz Branco Tipo 1",
+    "embalagem": "5kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": ["7891234567890", "7899876543210"],
+    "palavras_chave": ["arroz", "branco", "tipo 1", "agulhinha"]
+  },
+  {
+    "id": "feijao_carioca_1kg",
+    "categoria": "Feijão",
+    "nome_canonico": "Feijão Carioca",
+    "embalagem": "1kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": ["7894561237890"],
+    "palavras_chave": ["feijao", "carioca", "carioquinha"]
+  },
+  {
+    "id": "leite_integral_1l",
+    "categoria": "Leite",
+    "nome_canonico": "Leite Integral",
+    "embalagem": "1L",
+    "unidade_medida": "l",
+    "gtin_possiveis": ["7896541234567", "7893216549870"],
+    "palavras_chave": ["leite", "integral", "uht"]
+  },
+  {
+    "id": "oleo_soja_900ml",
+    "categoria": "Óleo",
+    "nome_canonico": "Óleo de Soja",
+    "embalagem": "900ml",
+    "unidade_medida": "l",
+    "gtin_possiveis": ["7891234509876"],
+    "palavras_chave": ["oleo", "soja", "refogado"]
+  },
+  {
+    "id": "acucar_cristal_1kg",
+    "categoria": "Açúcar",
+    "nome_canonico": "Açúcar Cristal",
+    "embalagem": "1kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": ["7896543217890"],
+    "palavras_chave": ["acucar", "cristal", "refinado"]
+  },
+  {
+    "id": "cafe_torrado_500g",
+    "categoria": "Café",
+    "nome_canonico": "Café Torrado e Moído",
+    "embalagem": "500g",
+    "unidade_medida": "kg",
+    "gtin_possiveis": ["7891234560001"],
+    "palavras_chave": ["cafe", "torrado", "moido", "expresso"]
+  },
+  {
+    "id": "frango_peito_kg",
+    "categoria": "Frango",
+    "nome_canonico": "Peito de Frango",
+    "embalagem": "por kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": [],
+    "palavras_chave": ["peito", "frango", "filé de frango"]
+  },
+  {
+    "id": "frango_coxa_kg",
+    "categoria": "Frango",
+    "nome_canonico": "Coxa e Sobrecoxa de Frango",
+    "embalagem": "por kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": [],
+    "palavras_chave": ["coxa", "sobrecoxa", "frango"]
+  },
+  {
+    "id": "alcatra_kg",
+    "categoria": "Carne Bovina",
+    "nome_canonico": "Alcatra Bovina",
+    "embalagem": "por kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": [],
+    "palavras_chave": ["alcatra", "bovina", "coracao alcatra"]
+  },
+  {
+    "id": "ovos_brancos_dz",
+    "categoria": "Ovos",
+    "nome_canonico": "Ovos Brancos",
+    "embalagem": "12 unidades",
+    "unidade_medida": "unidade",
+    "gtin_possiveis": ["7891234509100"],
+    "palavras_chave": ["ovos", "brancos", "dúzia"]
+  },
+  {
+    "id": "macarrao_espaguete_500g",
+    "categoria": "Macarrão",
+    "nome_canonico": "Macarrão Espaguete",
+    "embalagem": "500g",
+    "unidade_medida": "kg",
+    "gtin_possiveis": ["7891000111111"],
+    "palavras_chave": ["macarrao", "espaguete", "spaghetti", "pasta"]
+  },
+  {
+    "id": "manteiga_200g",
+    "categoria": "Manteiga",
+    "nome_canonico": "Manteiga com Sal",
+    "embalagem": "200g",
+    "unidade_medida": "kg",
+    "gtin_possiveis": ["7896543219870"],
+    "palavras_chave": ["manteiga", "com sal", "tablete"]
+  },
+  {
+    "id": "tomate_kg",
+    "categoria": "Hortifruti",
+    "nome_canonico": "Tomate Salada",
+    "embalagem": "por kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": [],
+    "palavras_chave": ["tomate", "salada", "vermelho"]
+  },
+  {
+    "id": "batata_kg",
+    "categoria": "Hortifruti",
+    "nome_canonico": "Batata Inglesa",
+    "embalagem": "por kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": [],
+    "palavras_chave": ["batata", "inglesa", "lavada"]
+  },
+  {
+    "id": "banana_kg",
+    "categoria": "Hortifruti",
+    "nome_canonico": "Banana Prata",
+    "embalagem": "por kg",
+    "unidade_medida": "kg",
+    "gtin_possiveis": [],
+    "palavras_chave": ["banana", "prata", "cacho"]
+  }
+]
