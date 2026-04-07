@@ -12,7 +12,7 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxghC6hHeRMGm7_db8YANOfG_sMlgBiWVAnrUwIdXIAhnqWZVBOHIGAjjlLeOE35PxfUQ/exec';
 
 // Fallback direto no GitHub (caso GAS esteja fora ou em deploy novo)
-const GITHUB_RAW = 'https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPOSITORIO/main/dados';
+const GITHUB_RAW = 'https://raw.githubusercontent.com/tchelojc/preco_justo/main/dados';
 
 // ─── Estado Global ───────────────────────────────────────────
 let STATE = {
