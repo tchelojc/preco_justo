@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparador RJ — Menores Preços de Supermercado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════════
+       DESIGN: Mercado urbano carioca — verde-amarelo
+       Tipografia condensada + industrial
+    ═══════════════════════════════════════════ */
+
+    :root {
+      --verde:     #00843D;
+      --verde-esc: #005C2B;
+      --amarelo:   #FFD100;
+      --vermelho:  #E31E26;
+      --cinza-f:   #F4F4F2;
+      --cinza-m:   #E0E0DC;
+      --cinza-e:   #888880;
+      --preto:     #111110;
+      --branco:    #FFFFFF;
+      --sombra:    0 2px 12px rgba(0,0,0,0.10);
+      --raio:      6px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--cinza-f);
+      color: var(--preto);
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────── */
+    .header {
+      background: var(--verde);
+      color: var(--branco);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.20);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .logo-block {
+      padding: 12px 24px 12px 0;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo-titulo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 26px;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-titulo span {
+      color: var(--amarelo);
+    }
+
+    .logo-sub {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      margin-top: 2px;
+    }
+
+    .header-busca {
+      flex: 1;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .select-produto {
+      flex: 1;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: var(--raio);
+      background: rgba(255,255,255,0.12);
+      color: var(--branco);
+      appearance: none;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+
+    .select-produto:focus {
+      outline: none;
+      border-color: var(--amarelo);
+      background: rgba(255,255,255,0.20);
+    }
+
+    .select-produto option,
+    .select-produto optgroup {
+      color: var(--preto);
+      background: var(--branco);
+    }
+
+    .btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border: none;
+      border-radius: var(--raio);
+      cursor: pointer;
+      transition: transform .15s, opacity .2s;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(.97); }
+
+    .btn-buscar {
+      background: var(--amarelo);
+      color: var(--preto);
+    }
+
+    .btn-buscar:hover { opacity: .9; }
+
+    .btn-atualizar {
+      background: transparent;
+      color: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 10px 14px;
+      font-size: 18px;
+    }
+
+    .btn-atualizar:hover { color: var(--branco); border-color: rgba(255,255,255,0.6); }
+
+    /* ── Faixa mercados ───────────────────────── */
+    .faixa-mercados {
+      background: var(--verde-esc);
+      border-bottom: 2px solid var(--amarelo);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .faixa-mercados::-webkit-scrollbar { display: none; }
+
+    .faixa-mercados-inner {
+      max-width: 1100px;
+      margin: auto;
+      padding: 6px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .faixa-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+      margin-right: 4px;
+    }
+
+    .chip-mercado {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1.5px solid #ccc;
+      color: rgba(255,255,255,0.80);
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Corpo ───────────────────────────────── */
+    .corpo {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    /* ── Loading / Erros ─────────────────────── */
+    .loading-state,
+    .estado-vazio,
+    .estado-erro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      gap: 14px;
+      color: var(--cinza-e);
+      text-align: center;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--cinza-m);
+      border-top-color: var(--verde);
+      border-radius: 50%;
+      animation: giro 0.7s linear infinite;
+    }
+
+    @keyframes giro { to { transform: rotate(360deg); } }
+
+    .icone-vazio, .icone-erro { font-size: 40px; }
+
+    .estado-erro { color: var(--vermelho); }
+
+    .detalhe-erro {
+      font-size: 12px;
+      color: var(--cinza-e);
+      max-width: 400px;
+    }
+
+    /* ── Resumo header ───────────────────────── */
+    .resumo-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .produto-titulo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--verde-esc);
+    }
+
+    .embalagem {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--cinza-e);
+    }
+
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .badge-mercados,
+    .badge-hora {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .badge-mercados {
+      background: var(--verde);
+      color: var(--branco);
+    }
+
+    .badge-hora {
+      background: var(--cinza-m);
+      color: var(--cinza-e);
+    }
+
+    /* ── Grade de cards ──────────────────────── */
+    .grade-resultados {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Card de mercado ─────────────────────── */
+    .card-mercado {
+      background: var(--branco);
+      border-radius: var(--raio);
+      border: 2px solid transparent;
+      border-left: 5px solid var(--cor-mercado, var(--cinza-m));
+      box-shadow: var(--sombra);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: box-shadow .2s, transform .2s;
+    }
+
+    .card-mercado:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.14);
+      transform: translateY(-2px);
+    }
+
+    .card-entrada {
+      animation: entrar .35s ease-out forwards;
+    }
+
+    @keyframes entrar {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-melhor {
+      border: 2px solid var(--verde);
+      border-left: 5px solid var(--verde);
+      background: #F0FAF4;
+    }
+
+    .ribbon-melhor {
+      background: var(--verde);
+      color: var(--branco);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      text-align: center;
+    }
+
+    .card-topo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px 8px;
+    }
+
+    .logo-mercado {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .nome-mercado {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      flex: 1;
+    }
+
+    .economia-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--vermelho);
+      background: #FFF0F0;
+      border: 1px solid #FFD0D0;
+      border-radius: 4px;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    .card-corpo {
+      padding: 8px 14px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nome-produto-site {
+      font-size: 12px;
+      color: var(--cinza-e);
+      line-height: 1.3;
+    }
+
+    .preco-grande {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      color: var(--preto);
+      line-height: 1;
+    }
+
+    .card-melhor .preco-grande {
+      color: var(--verde-esc);
+    }
+
+    .preco-unidade {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cinza-e);
+      background: var(--cinza-f);
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* ── Outras opções (details) ─────────────── */
+    .outras-opcoes {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .outras-opcoes summary {
+      cursor: pointer;
+      color: var(--verde);
+      font-weight: 600;
+      list-style: none;
+      padding: 4px 0;
+      border-top: 1px solid var(--cinza-m);
+    }
+
+    .outras-opcoes summary::-webkit-details-marker { display: none; }
+
+    .outras-opcoes ul {
+      list-style: none;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .outras-opcoes li {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--cinza-m);
+    }
+
+    .op-nome { color: var(--cinza-e); flex: 1; }
+    .op-preco { font-weight: 700; white-space: nowrap; }
+
+    /* ── Link produto ────────────────────────── */
+    .link-produto {
+      display: block;
+      text-align: center;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--verde);
+      border-top: 1px solid var(--cinza-m);
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+
+    .link-produto:hover {
+      background: var(--verde);
+      color: var(--branco);
+    }
+
+    /* ── Hint ────────────────────────────────── */
+    .hint {
+      font-size: 12px;
+      color: var(--cinza-e);
+    }
+
+    /* ── Footer ──────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+      color: var(--cinza-e);
+      border-top: 1px solid var(--cinza-m);
+      background: var(--branco);
+    }
+
+    /* ── Responsivo ──────────────────────────── */
+    @media (max-width: 640px) {
+      .header-inner { flex-direction: column; padding: 12px 16px; }
+      .logo-block    { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); padding: 0 0 10px; }
+      .header-busca  { flex-wrap: wrap; padding: 10px 0 0; }
+      .btn-buscar    { flex: 1; }
+      .grade-resultados { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-inner">
+
+      <div class="logo-block">
+        <div class="logo-titulo">Comparador<span>RJ</span></div>
+        <div class="logo-sub">Preços de supermercado</div>
+      </div>
+
+      <div class="header-busca">
+        <select id="select-produto" class="select-produto" aria-label="Selecionar produto">
+          <option value="">Carregando produtos…</option>
+        </select>
+        <button id="btn-buscar" class="btn btn-buscar">Comparar</button>
+        <button id="btn-atualizar" class="btn btn-atualizar" title="Atualizar resultados">↻</button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── Faixa de mercados monitorados ──────────────── -->
+  <div class="faixa-mercados">
+    <div class="faixa-mercados-inner">
+      <span class="faixa-label">Monitorando:</span>
+      <div id="chips-mercados" style="display:flex;gap:8px;flex-wrap:nowrap;"></div>
+    </div>
+  </div>
+
+  <!-- ── Corpo ──────────────────────────────────────── -->
+  <main class="corpo">
+    <div id="resultados">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Iniciando comparador…</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────── -->
+  <footer class="footer">
+    Preços atualizados automaticamente a cada 6 horas · GitHub Actions + Google Apps Script · Dados meramente informativos
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
