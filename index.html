@@ -315,6 +315,30 @@
       color: var(--texto-medio);
     }
     .small-text { font-size: 0.7rem; color: var(--texto-medio); text-align: center; margin-top: 12px; }
+
+    /* Card de afeto (gratidão) */
+    .card-afeto {
+      background: #fef9e3;
+      border-radius: 28px;
+      padding: 24px;
+      margin: 30px 0;
+      border-left: 8px solid var(--amarelo);
+    }
+    .card-afeto h3 { font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
+    .pergunta-gratidao { font-size: 1.2rem; margin: 16px 0; }
+    .btn-afeto {
+      background: var(--verde);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 60px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 12px;
+      margin-top: 8px;
+      transition: 0.2s;
+    }
+    .btn-respira { background: #F59E0B; }
   </style>
 </head>
 <body>
@@ -434,8 +458,8 @@
   // ========== ESTADO GLOBAL ==========
   let todosProdutos = [];
   let todosMercados = [];
-  let precosPorProdutoMercado = {}; // chave "produtoId|mercadoId" -> preco object
-  let mercadoAtivo = null; // null = menor preço global; senão id do mercado
+  let precosPorProdutoMercado = {};
+  let mercadoAtivo = null;
   let ordenacao = 'menor_preco';
   let modoAtual = 'essencial';
   let termoBusca = '';
@@ -518,11 +542,13 @@
       todosMercados = mercados.filter(m => m.ativo);
       // Carrega todos os preços destaque
       precosPorProdutoMercado = {};
+      let totalPrecos = 0;
       for (const produto of todosProdutos) {
         for (const mercado of todosMercados) {
           const preco = await obterPrecoDestaque(produto.id, mercado.id);
           if (preco) {
             precosPorProdutoMercado[`${produto.id}|${mercado.id}`] = preco;
+            totalPrecos++;
           }
         }
       }
@@ -575,11 +601,9 @@
       return true;
     });
 
-    // Para cada produto, determinar o preço a exibir (conforme mercadoAtivo)
     const produtosComPreco = filtrados.map(produto => {
       let precoInfo = null;
       if (mercadoAtivo === null) {
-        // menor preço global
         let melhorPreco = null;
         let melhorMercado = null;
         for (const mercado of todosMercados) {
@@ -602,7 +626,6 @@
       return { produto, precoInfo };
     });
 
-    // Ordenação
     if (ordenacao === 'menor_preco') {
       produtosComPreco.sort((a,b) => (a.precoInfo?.preco || 999999) - (b.precoInfo?.preco || 999999));
     } else {
@@ -626,14 +649,30 @@
       const mercadoNome = temPreco ? precoInfo.mercado_nome : 'Aguardando';
       const dataPreco = temPreco && precoInfo.dataHora ? new Date(precoInfo.dataHora).toLocaleString('pt-BR') : '';
       const fotoUrl = temPreco ? precoInfo.fotoUrl : null;
-      const unidadeMedida = produto.unidade_medida || 'kg';
+      // Cálculo simples de preço por unidade (assumindo que a embalagem contém número)
+      let precoPorKg = '';
+      if (isCompleto && temPreco) {
+        const pesoMatch = produto.embalagem.match(/(\d+(?:[.,]\d+)?)/);
+        if (pesoMatch) {
+          let peso = parseFloat(pesoMatch[1].replace(',', '.'));
+          if (produto.embalagem.includes('kg') || produto.embalagem.includes('Kg')) {
+            precoPorKg = `R$ ${(precoInfo.preco / peso).toFixed(2).replace('.',',')}/kg`;
+          } else if (produto.embalagem.includes('g') || produto.embalagem.includes('G')) {
+            precoPorKg = `R$ ${(precoInfo.preco / (peso / 1000)).toFixed(2).replace('.',',')}/kg`;
+          } else if (produto.embalagem.includes('l') || produto.embalagem.includes('L')) {
+            precoPorKg = `R$ ${(precoInfo.preco / peso).toFixed(2).replace('.',',')}/litro`;
+          } else if (produto.embalagem.includes('un')) {
+            precoPorKg = `R$ ${precoInfo.preco.toFixed(2).replace('.',',')}/unidade`;
+          }
+        }
+      }
       return `
         <div class="produto-card">
           <div class="card-categoria">${produto.categoria}</div>
           <div class="card-nome">${produto.nome_canonico}</div>
           <div class="card-embalagem">${produto.embalagem}</div>
           ${temPreco ? `<div class="preco-grande">${precoStr}</div>` : `<div class="sem-preco">⏳ Aguardando primeiro preço</div>`}
-          ${isCompleto && temPreco ? `<div class="preco-unidade">R$ ${(precoInfo.preco / (parseFloat(produto.embalagem.match(/\d+(?:[.,]\d+)?/)?.[0] || 1)).toFixed(2).replace('.',',')}/${unidadeMedida}</div>` : ''}
+          ${isCompleto && precoPorKg ? `<div class="preco-unidade">${precoPorKg}</div>` : ''}
           ${temPreco ? `<div style="margin: 6px 0; font-size:0.75rem;"><i class="fas fa-store"></i> ${mercadoNome}</div>` : ''}
           ${dataPreco ? `<div style="font-size:0.65rem; color:var(--texto-medio);"><i class="far fa-clock"></i> ${dataPreco}</div>` : ''}
           ${fotoUrl ? `<div class="foto-miniatura"><a href="${fotoUrl}" target="_blank"><img src="${fotoUrl}" alt="Comprovante" loading="lazy"></a></div>` : ''}
@@ -671,7 +710,11 @@
     document.getElementById('fotoPreview').style.display = 'none';
   }
 
-  document.getElementById('fecharModalPreco').onclick = () => document.getElementById('modalEnvioPreco').style.display = 'none';
+  document.getElementById('fecharModalPreco').onclick = () => {
+    document.getElementById('modalEnvioPreco').style.display = 'none';
+    document.getElementById('fotoPreview').style.display = 'none';
+    document.getElementById('fotoInput').value = '';
+  };
   document.getElementById('fotoInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -682,6 +725,8 @@
         preview.style.display = 'block';
       };
       reader.readAsDataURL(file);
+    } else {
+      document.getElementById('fotoPreview').style.display = 'none';
     }
   });
 
@@ -717,8 +762,7 @@
         else msg += ` Próxima atualização permitida ${janela.texto}.`;
         toast(msg, 'success');
         document.getElementById('modalEnvioPreco').style.display = 'none';
-        // Recarrega dados
-        await carregarDadosIniciais();
+        await carregarDadosIniciais(); // recarrega tudo
       } else throw new Error(resultado.erro);
     } catch (err) {
       console.error(err);
