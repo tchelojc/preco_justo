@@ -2,18 +2,14 @@ name: 🛒 Atualizar Preços — Supermercados RJ
 
 on:
   schedule:
-    # Executa a cada 6 horas: meia-noite, 6h, 12h e 18h (horário UTC = BRT-3)
-    - cron: '0 3,9,15,21 * * *'
-  
-  # Permite executar manualmente pela aba Actions do GitHub
+    - cron: '0 11,19 * * *'   # 8h e 16h BRT
   workflow_dispatch:
 
 jobs:
   scrape-precos:
     runs-on: ubuntu-latest
-    
     permissions:
-      contents: write   # Necessário para fazer git push dos JSONs
+      contents: write
 
     steps:
       - name: 📥 Checkout do repositório
@@ -23,18 +19,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: scripts/package-lock.json
 
       - name: 📦 Instalar dependências
-        run: |
-          cd scripts
-          npm install
+        run: npm install jsdom
 
       - name: 🔍 Executar Scraper
-        run: |
-          cd scripts
-          node scraper.js
+        run: node scraper.js
         env:
           NODE_OPTIONS: '--max-old-space-size=512'
 
@@ -43,7 +33,6 @@ jobs:
           git config --global user.name  'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add dados/precos_cache/
-          # Só commita se houver mudanças
           git diff --quiet && git diff --staged --quiet || \
             git commit -m "📊 Preços atualizados — $(TZ='America/Sao_Paulo' date +'%d/%m/%Y %H:%M') BRT"
           git push
