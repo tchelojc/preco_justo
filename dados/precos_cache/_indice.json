@@ -1,0 +1,6 @@
+{
+  "data_geracao": "2026-04-07T22:00:00.000Z",
+  "mercados": ["prezunic", "guanabara", "mundial", "supermarket", "paodeacucar"],
+  "produtos": ["arroz_tipo1_5kg", "feijao_carioca_1kg", "leite_integral_1l"],
+  "total_arquivos": 15
+}
