@@ -11,7 +11,7 @@ function normalizarPreco(texto) {
   if (!texto) return null;
   const limpo = texto.replace(/[^\d,.-]/g, '').replace(',', '.');
   const num = parseFloat(limpo);
-  return isNaN(num) ? null : num;
+  return isNaN(num) || num <= 0 ? null : num;
 }
 
 function calcularPrecoUnidade(preco, nome, embalagem) {
@@ -40,16 +40,72 @@ function bateProduto(nomeSite, palavrasChave) {
   return palavrasChave.some(p => nomeNorm.includes(normalizarTexto(p)));
 }
 
+// ========== EXTRAÇÃO ROBUSTA ==========
+async function extrairItensDaPagina(page, categoria) {
+  const seletoresAlternativos = {
+    item: [categoria.seletores.item, '.product', '[class*="product"]', 'li', 'article'],
+    nome: [categoria.seletores.nome, '.name', '[class*="title"]', 'h2', 'h3', 'a'],
+    preco: [categoria.seletores.preco, '.price', '[class*="price"]', '.valor', 'strong', 'span'],
+    link: [categoria.seletores.link, 'a', '[href*="/p/"]', '[href*="/produto/"]'],
+  };
+
+  // Tenta cada combinação de seletores até encontrar itens
+  for (const itemSel of seletoresAlternativos.item) {
+    try {
+      await page.waitForSelector(itemSel, { timeout: 5000 }).catch(() => {});
+      
+      const itens = await page.$$eval(itemSel, (elements, selNomeList, selPrecoList, selLinkList) => {
+        return elements.map(el => {
+          // Tenta extrair nome
+          let nome = '';
+          for (const sel of selNomeList) {
+            nome = el.querySelector(sel)?.innerText?.trim() || '';
+            if (nome) break;
+          }
+          
+          // Tenta extrair preço
+          let preco = '';
+          for (const sel of selPrecoList) {
+            preco = el.querySelector(sel)?.innerText?.trim() || '';
+            if (preco) break;
+          }
+          
+          // Tenta extrair link
+          let link = '';
+          for (const sel of selLinkList) {
+            const anchor = el.querySelector(sel);
+            link = anchor?.href || '';
+            if (link) break;
+          }
+          
+          return { nome, preco, link };
+        }).filter(item => item.nome && item.preco);
+      }, seletoresAlternativos.nome, seletoresAlternativos.preco, seletoresAlternativos.link);
+      
+      if (itens.length > 0) return itens;
+    } catch (e) {
+      // Continua tentando próximo seletor
+    }
+  }
+  
+  return [];
+}
+
 // ========== MAIN ==========
 async function main() {
   console.log('🚀 Iniciando scraper por categorias...\n');
 
-  const categoriasMercados = JSON.parse(fs.readFileSync(path.join(DIR_DADOS, 'categorias_mercados.json'), 'utf8'));
   const mercados = JSON.parse(fs.readFileSync(path.join(DIR_DADOS, 'mercados_rj.json'), 'utf8'));
   const produtos = JSON.parse(fs.readFileSync(path.join(DIR_DADOS, 'produtos_base.json'), 'utf8'));
-  const ativos = mercados.filter(m => m.ativo && categoriasMercados[m.id]);
+  const ativos = mercados.filter(m => m.ativo && m.tipo === 'pagina_categoria');
 
-  const browser = await chromium.launch({ headless: true });
+  console.log(`📋 Mercados ativos: ${ativos.map(m => m.nome).join(', ')}`);
+  console.log(`📦 Produtos no catálogo: ${produtos.length}\n`);
+
+  const browser = await chromium.launch({ 
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 },
@@ -59,29 +115,22 @@ async function main() {
 
   for (const mercado of ativos) {
     console.log(`\n🏬 ${mercado.nome}`);
-    const config = categoriasMercados[mercado.id];
     const page = await context.newPage();
 
-    // Objeto para acumular resultados de todas as categorias deste mercado
     const resultadosPorProduto = {};
     for (const produto of produtos) {
       resultadosPorProduto[produto.id] = [];
     }
 
-    for (const categoria of config.categorias) {
+    for (const categoria of mercado.categorias) {
       console.log(`   📂 Categoria: ${categoria.nome}`);
+      console.log(`      🔗 URL: ${categoria.url}`);
+      
       try {
-        await page.goto(categoria.url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-        await page.waitForSelector(categoria.seletores.item, { timeout: 10000 }).catch(() => {});
-
-        const itens = await page.$$eval(categoria.seletores.item, (elements, selNome, selPreco, selLink) => {
-          return elements.map(el => {
-            const nome = el.querySelector(selNome)?.innerText?.trim() || '';
-            const preco = el.querySelector(selPreco)?.innerText?.trim() || '';
-            const link = el.querySelector(selLink)?.href || '';
-            return { nome, preco, link };
-          });
-        }, categoria.seletores.nome, categoria.seletores.preco, categoria.seletores.link);
+        await page.goto(categoria.url, { waitUntil: 'domcontentloaded', timeout: 25000 });
+        
+        const itens = await extrairItensDaPagina(page, categoria);
+        console.log(`      📊 ${itens.length} itens encontrados`);
 
         for (const item of itens) {
           const precoNum = normalizarPreco(item.preco);
@@ -90,24 +139,32 @@ async function main() {
           for (const produto of produtos) {
             if (bateProduto(item.nome, produto.palavras_chave)) {
               resultadosPorProduto[produto.id].push({
-                nome: item.nome,
+                nome: item.nome.substring(0, 100),
                 preco: precoNum,
                 preco_por_unidade: calcularPrecoUnidade(precoNum, item.nome, produto.embalagem),
-                url: item.link,
+                url: item.link || categoria.url,
               });
               break;
             }
           }
         }
 
-        console.log(`      ✅ ${itens.length} itens extraídos`);
+        // Log de produtos encontrados
+        const produtosEncontrados = Object.entries(resultadosPorProduto)
+          .filter(([_, arr]) => arr.length > 0)
+          .map(([id]) => produtos.find(p => p.id === id)?.nome_canonico);
+        
+        if (produtosEncontrados.length > 0) {
+          console.log(`      🛒 Produtos: ${produtosEncontrados.join(', ')}`);
+        }
       } catch (err) {
         console.log(`      ❌ Erro: ${err.message}`);
       }
+      
       await page.waitForTimeout(2000);
     }
 
-    // Salva os arquivos de cache para este mercado
+    // Salva resultados
     for (const produto of produtos) {
       const resultados = resultadosPorProduto[produto.id] || [];
       const cacheFile = path.join(DIR_CACHE, `${mercado.id}_${produto.id}.json`);
@@ -122,6 +179,9 @@ async function main() {
         resultados: resultados.slice(0, 5),
       }, null, 2));
 
+      if (resultados.length > 0) {
+        console.log(`   ✅ ${produto.nome_canonico}: ${resultados.length} opções`);
+      }
       arquivosGerados++;
     }
 
@@ -130,7 +190,6 @@ async function main() {
 
   await browser.close();
 
-  // Índice
   fs.writeFileSync(path.join(DIR_CACHE, '_indice.json'), JSON.stringify({
     atualizado_em: new Date().toISOString(),
     mercados: ativos.map(m => m.id),
@@ -141,4 +200,8 @@ async function main() {
   console.log(`\n✨ Concluído! ${arquivosGerados} arquivos gerados.`);
 }
 
-main().catch(err => { console.error('💥 Erro:', err); process.exit(1); });
+main().catch(err => { 
+  console.error('💥 Erro fatal:', err.message);
+  console.error(err.stack);
+  process.exit(1); 
+});
