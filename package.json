@@ -1,12 +1,9 @@
 {
   "name": "preco_justo",
   "version": "1.0.0",
-  "description": "Scraper de preços de supermercados do RJ",
+  "description": "Comparador de preços de supermercados do Rio de Janeiro",
   "main": "scraper.js",
-  "scripts": {
-    "start": "node scraper.js"
-  },
   "dependencies": {
-    "jsdom": "^24.0.0"
+    "playwright": "^1.40.0"
   }
 }
