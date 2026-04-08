@@ -1,32 +1,82 @@
 [
   {
-    "id": "guanabara",
-    "nome": "Guanabara",
-    "logo": "🛍️",
-    "cor": "#FF8C00",
-    "base_url": "https://www.supermercadosguanabara.com.br",
-    "busca_url_template": "/produtos?q={TERMO}",
-    "plataforma": "vtex",
-    "ativo": true
-  },
-  {
     "id": "mundial",
     "nome": "Mundial",
     "logo": "🏪",
     "cor": "#0066CC",
-    "base_url": "https://www.sitemercado.com.br/supermercadosmundial",
-    "busca_url_template": "/busca?q={TERMO}",
-    "plataforma": "sitemercado",
-    "ativo": true
+    "ativo": true,
+    "tipo": "pagina_categoria",
+    "categorias": [
+      {
+        "nome": "Açougue",
+        "url": "https://www.supermercadosmundial.com.br/departamentos/categoria/acougue?page=1",
+        "seletores": {
+          "item": ".product",
+          "nome": ".product-title",
+          "preco": ".price",
+          "link": "a"
+        }
+      },
+      {
+        "nome": "Mercearia",
+        "url": "https://www.supermercadosmundial.com.br/departamentos/categoria/mercearia?page=1",
+        "seletores": {
+          "item": ".product",
+          "nome": ".product-title",
+          "preco": ".price",
+          "link": "a"
+        }
+      }
+    ]
+  },
+  {
+    "id": "guanabara",
+    "nome": "Guanabara",
+    "logo": "🛍️",
+    "cor": "#FF8C00",
+    "ativo": true,
+    "tipo": "pagina_categoria",
+    "categorias": [
+      {
+        "nome": "Mercearia",
+        "url": "https://www.supermercadosguanabara.com.br/mercearia",
+        "seletores": {
+          "item": ".vtex-product-summary-2-x-container",
+          "nome": ".vtex-product-summary-2-x-productBrand",
+          "preco": ".vtex-product-price-1-x-sellingPrice",
+          "link": "a"
+        }
+      }
+    ]
   },
   {
     "id": "hortifruti",
     "nome": "Hortifruti",
     "logo": "🥦",
     "cor": "#2E8B57",
-    "base_url": "https://www.hortifruti.com.br",
-    "busca_url_template": "/busca?q={TERMO}",
-    "plataforma": "hortifruti",
-    "ativo": true
+    "ativo": true,
+    "tipo": "pagina_categoria",
+    "categorias": [
+      {
+        "nome": "Churrasco",
+        "url": "https://www.hortifruti.com.br/tudo-para-seu-churrasco",
+        "seletores": {
+          "item": ".product-item",
+          "nome": ".product-name",
+          "preco": ".price",
+          "link": "a"
+        }
+      },
+      {
+        "nome": "Feira",
+        "url": "https://www.hortifruti.com.br/feira",
+        "seletores": {
+          "item": ".product",
+          "nome": ".name",
+          "preco": ".price",
+          "link": "a"
+        }
+      }
+    ]
   }
 ]
