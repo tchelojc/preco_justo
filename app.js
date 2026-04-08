@@ -8,7 +8,7 @@
  */
 
 // ========== CONFIGURAÇÃO ==========
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzCPWvgsiorIe0qUwi_9SNAZ6x3L9Vwg-w20IKSAyoDMVtaUyy7fmAQ8ljg3kgJImfQOw/exec';
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwr_88m_9nTlY4Om2zZV_MbRipepSDzaB5dkDie0cVVB-oSWOnTLJzlmtIGCv0EDZsUlw/exec';
 const IMGBB_API_KEY = '2597fbdd4014975ed01d56ee9a6b404d'; // sua chave
 
 // ========== ESTADO GLOBAL ==========
