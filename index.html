@@ -534,15 +534,28 @@
     });
   }
 
-  // ========== CARREGAR DADOS ==========
   async function carregarDadosIniciais() {
     try {
       const [produtos, mercados] = await Promise.all([listarProdutos(), listarMercados()]);
       todosProdutos = produtos;
       todosMercados = mercados.filter(m => m.ativo);
+      // Carrega todos os preços destaque
+      precosPorProdutoMercado = {};
+      for (const produto of todosProdutos) {
+        for (const mercado of todosMercados) {
+          const preco = await obterPrecoDestaque(produto.id, mercado.id);
+          if (preco) {
+            precosPorProdutoMercado[`${produto.id}|${mercado.id}`] = preco;
+          }
+        }
+      }
+      renderizarAbasMercados();
+      renderizarProdutos();
+      atualizarStats();
     } catch (err) {
-      console.error("Erro ao carregar dados do backend:", err);
-      // FALLBACK: lista completa de mercados (igual ao mercados.json esperado)
+      console.error(err);
+      document.getElementById('produtosContainer').innerHTML = '<div style="text-align:center; padding:60px;">⚠️ Erro ao carregar. Tente recarregar.</div>';
+      // Fallback: mercados completos (para as abas aparecerem)
       todosMercados = [
         { id: "guanabara", nome: "Guanabara", logo: "🛍️", cor: "#FF8C00", ativo: true },
         { id: "paodeacucar", nome: "Pão de Açúcar", logo: "🔴", cor: "#CC0000", ativo: true },
@@ -552,11 +565,10 @@
         { id: "supermarket", nome: "Super Market", logo: "🏬", cor: "#006400", ativo: true },
         { id: "hortifruti", nome: "Hortifruti", logo: "🥦", cor: "#2E8B57", ativo: true }
       ];
-      todosProdutos = []; // ou tenta carregar de um cache local se disponível
+      todosProdutos = []; // sem produtos, mas abas aparecem
+      renderizarAbasMercados();
+      renderizarProdutos(); // exibirá "Nenhum produto encontrado"
     }
-    renderizarAbasMercados();  // sempre executa (as abas aparecerão mesmo sem produtos)
-    renderizarProdutos();
-    atualizarStats();
   }
 
   function atualizarStats() {
