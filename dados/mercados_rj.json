@@ -1,5 +1,53 @@
 [
   {
+    "id": "guanabara",
+    "nome": "Guanabara",
+    "logo": "🛍️",
+    "cor": "#FF8C00",
+    "base_url": "https://www.supermercadosguanabara.com.br",
+    "busca_url_template": "/api/catalog_system/pub/products/search/{TERMO}?_from=0&_to=9",
+    "container_produto": ".vtex-product-summary-2-x-container",
+    "json_ld_esperado": true,
+    "plataforma": "vtex",
+    "ativo": true
+  },
+  {
+    "id": "paodeacucar",
+    "nome": "Pão de Açúcar",
+    "logo": "🔴",
+    "cor": "#CC0000",
+    "base_url": "https://www.paodeacucar.com",
+    "busca_url_template": "/api/catalog_system/pub/products/search/{TERMO}?_from=0&_to=9",
+    "container_produto": "[data-testid='product-card']",
+    "json_ld_esperado": true,
+    "plataforma": "vtex",
+    "ativo": true
+  },
+  {
+    "id": "atacadao",
+    "nome": "Atacadão",
+    "logo": "📦",
+    "cor": "#FFD700",
+    "base_url": "https://www.atacadao.com.br",
+    "busca_url_template": "/api/catalog_system/pub/products/search/{TERMO}?_from=0&_to=9",
+    "container_produto": ".vtex-product-summary",
+    "json_ld_esperado": true,
+    "plataforma": "vtex",
+    "ativo": true
+  },
+  {
+    "id": "prezunic",
+    "nome": "Prezunic",
+    "logo": "🛒",
+    "cor": "#E31E26",
+    "base_url": "https://www.prezunic.com.br",
+    "busca_url_template": "/api/catalog_system/pub/products/search/{TERMO}?_from=0&_to=9",
+    "container_produto": ".vtex-product-summary",
+    "json_ld_esperado": true,
+    "plataforma": "vtex",
+    "ativo": true
+  },
+  {
     "id": "mundial",
     "nome": "Mundial",
     "logo": "🏪",
@@ -9,18 +57,6 @@
     "container_produto": "[data-product-id]",
     "json_ld_esperado": true,
     "plataforma": "sitemercado",
-    "ativo": true
-  },
-  {
-    "id": "guanabara",
-    "nome": "Guanabara",
-    "logo": "🛍️",
-    "cor": "#FF8C00",
-    "base_url": "https://www.supermercadosguanabara.com.br",
-    "busca_url_template": "/produtos?q={TERMO}",
-    "container_produto": ".vtex-product-summary-2-x-container",
-    "json_ld_esperado": true,
-    "plataforma": "vtex",
     "ativo": true
   },
   {
@@ -36,18 +72,6 @@
     "ativo": true
   },
   {
-    "id": "paodeacucar",
-    "nome": "Pão de Açúcar",
-    "logo": "🔴",
-    "cor": "#CC0000",
-    "base_url": "https://www.paodeacucar.com",
-    "busca_url_template": "/busca?terms={TERMO}",
-    "container_produto": "[data-testid='product-card']",
-    "json_ld_esperado": true,
-    "plataforma": "vtex",
-    "ativo": true
-  },
-  {
     "id": "hortifruti",
     "nome": "Hortifruti",
     "logo": "🥦",
@@ -56,43 +80,7 @@
     "busca_url_template": "/busca?q={TERMO}",
     "container_produto": ".product-item",
     "json_ld_esperado": true,
-    "plataforma": "custom",
+    "plataforma": "hortifruti",
     "ativo": true
-  },
-  {
-    "id": "atacadao",
-    "nome": "Atacadão",
-    "logo": "📦",
-    "cor": "#FFD700",
-    "base_url": "https://www.atacadao.com.br",
-    "busca_url_template": "/busca?q={TERMO}",
-    "container_produto": ".vtex-product-summary",
-    "json_ld_esperado": true,
-    "plataforma": "vtex",
-    "ativo": true
-  },
-  {
-    "id": "prezunic",
-    "nome": "Prezunic",
-    "logo": "🛒",
-    "cor": "#E31E26",
-    "base_url": "https://www.prezunic.com.br",
-    "busca_url_template": "/{TERMO}?_q={TERMO}&map=ft",
-    "container_produto": ".vtex-product-summary",
-    "json_ld_esperado": true,
-    "plataforma": "vtex",
-    "ativo": false
-  },
-  {
-    "id": "rede_economia",
-    "nome": "Rede Economia",
-    "logo": "💰",
-    "cor": "#FFD700",
-    "base_url": "https://www.redeconomia.com.br",
-    "busca_url_template": "/busca?q={TERMO}",
-    "container_produto": ".produto",
-    "json_ld_esperado": false,
-    "plataforma": "custom",
-    "ativo": false
   }
 ]
