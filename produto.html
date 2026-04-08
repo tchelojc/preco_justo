@@ -4,299 +4,92 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#00843D">
-  <title>Preço Justo · Comparar Preços</title>
+  <title>Preço Justo · Detalhes do produto</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     :root {
       --verde: #00843D;
       --verde-esc: #005C2B;
       --amarelo: #FFD100;
-      --vermelho: #E31E26;
       --cinza-bg: #F4F6FA;
       --cinza-card: #FFFFFF;
       --cinza-border: #E9EEF3;
       --texto-escuro: #1A2634;
       --texto-medio: #5A6E8A;
     }
-    
     body {
       font-family: 'Inter', sans-serif;
       background: var(--cinza-bg);
       color: var(--texto-escuro);
+      transition: font-size 0.2s;
     }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px 24px;
-    }
-    
-    /* Header */
-    .top-bar {
-      background: var(--verde);
-      padding: 16px 24px;
-    }
-    
-    .top-bar-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    
-    .btn-voltar {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 50px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .btn-voltar:hover {
-      background: rgba(255,255,255,0.25);
-    }
-    
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: white;
-    }
-    
-    .logo span {
-      color: var(--amarelo);
-    }
-    
-    /* Produto Header */
-    .produto-header {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      margin: 24px 0;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      border: 1px solid var(--cinza-border);
-    }
-    
-    .produto-categoria {
-      display: inline-block;
-      background: rgba(0,132,61,0.1);
-      color: var(--verde);
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 4px 14px;
-      border-radius: 30px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 16px;
-    }
-    
-    .produto-titulo {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    
-    .produto-embalagem {
-      font-size: 1rem;
-      color: var(--texto-medio);
-      margin-bottom: 20px;
-    }
-    
-    .melhor-preco-destaque {
-      background: #F0FAF4;
-      border-radius: 20px;
-      padding: 24px;
-      margin-top: 20px;
-      border: 2px solid var(--verde);
-    }
-    
-    .melhor-preco-label {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--verde);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    
-    .melhor-preco-valor-destaque {
-      font-size: 3.5rem;
-      font-weight: 800;
-      color: var(--verde-esc);
-      line-height: 1;
-    }
-    
-    /* Grid de Mercados */
-    .mercados-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 20px;
-      margin-top: 24px;
-    }
-    
-    .mercado-card {
-      background: white;
-      border-radius: 20px;
-      border: 1px solid var(--cinza-border);
-      overflow: hidden;
-      transition: all 0.2s;
-    }
-    
-    .mercado-card.melhor {
-      border: 2px solid var(--verde);
-      background: #F0FAF4;
-    }
-    
-    .mercado-header {
-      padding: 20px;
-      border-bottom: 1px solid var(--cinza-border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .mercado-logo {
-      font-size: 2rem;
-    }
-    
-    .mercado-nome {
-      font-size: 1.2rem;
-      font-weight: 700;
-      flex: 1;
-    }
-    
-    .badge-melhor {
-      background: var(--verde);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    
-    .mercado-body {
-      padding: 20px;
-    }
-    
-    .produto-nome-site {
-      font-size: 0.85rem;
-      color: var(--texto-medio);
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
-    
-    .preco-mercado {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: var(--texto-escuro);
-    }
-    
-    .preco-unidade-mercado {
-      font-size: 0.85rem;
-      color: var(--texto-medio);
-      margin: 8px 0 16px;
-    }
-    
-    .btn-visitar {
-      display: inline-block;
-      background: var(--verde);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-    
-    .btn-visitar:hover {
-      background: var(--verde-esc);
-      transform: translateY(-2px);
-    }
-    
-    .economia-badge {
-      background: var(--vermelho);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 30px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: inline-block;
-      margin-left: 8px;
-    }
-    
-    /* Loading */
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 400px;
-      gap: 20px;
-    }
-    
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid var(--cinza-border);
-      border-top-color: var(--verde);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--texto-medio);
-    }
-    
-    .ultima-atualizacao {
-      text-align: center;
-      margin-top: 30px;
-      font-size: 0.8rem;
-      color: var(--texto-medio);
-    }
+    body.modo-essencial { font-size: 18px; }
+    body.modo-equilibrado { font-size: 17px; }
+    body.modo-completo { font-size: 16px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
+    .top-bar { background: var(--verde); padding: 16px 24px; }
+    .top-bar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 20px; }
+    .btn-voltar { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; border-radius: 50px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+    .logo { font-size: 1.5rem; font-weight: 800; color: white; }
+    .logo span { color: var(--amarelo); }
+    .produto-header { background: white; border-radius: 20px; padding: 30px; margin: 24px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .produto-categoria { display: inline-block; background: rgba(0,132,61,0.1); color: var(--verde); font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 30px; margin-bottom: 16px; }
+    .produto-titulo { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; }
+    .produto-embalagem { font-size: 1rem; color: var(--texto-medio); margin-bottom: 20px; }
+    .melhor-preco-destaque { background: #F0FAF4; border-radius: 20px; padding: 24px; margin-top: 20px; border: 2px solid var(--verde); }
+    .melhor-preco-valor-destaque { font-size: 3.5rem; font-weight: 800; color: var(--verde-esc); }
+    .mercados-grid { display: grid; gap: 20px; margin-top: 24px; }
+    body.modo-essencial .mercados-grid { grid-template-columns: 1fr; }
+    body.modo-equilibrado .mercados-grid { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+    body.modo-completo .mercados-grid { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+    .mercado-card { background: white; border-radius: 20px; border: 1px solid var(--cinza-border); overflow: hidden; }
+    .mercado-card.melhor { border: 2px solid var(--verde); background: #F0FAF4; }
+    .mercado-header { padding: 20px; border-bottom: 1px solid var(--cinza-border); display: flex; align-items: center; gap: 12px; }
+    .mercado-nome { font-size: 1.2rem; font-weight: 700; flex: 1; }
+    .badge-melhor { background: var(--verde); color: white; padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; }
+    .mercado-body { padding: 20px; }
+    .preco-mercado { font-size: 2.2rem; font-weight: 800; }
+    .preco-unidade-mercado { font-size: 0.85rem; color: var(--texto-medio); margin: 8px 0 16px; }
+    .btn-visitar { display: inline-block; background: var(--verde); color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; font-weight: 600; }
+    .economia-badge { background: #E31E26; color: white; padding: 4px 12px; border-radius: 30px; font-size: 0.75rem; margin-left: 8px; }
+    .loading-spinner { border: 4px solid #e2e8f0; border-top-color: var(--verde); width: 50px; height: 50px; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ultima-atualizacao { text-align: center; margin-top: 30px; font-size: 0.8rem; }
   </style>
 </head>
 <body>
 
 <header class="top-bar">
   <div class="top-bar-inner">
-    <a href="index.html" class="btn-voltar">
-      <i class="fas fa-arrow-left"></i> Voltar
-    </a>
+    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar</a>
     <div class="logo">Preço<span>Justo</span></div>
   </div>
 </header>
 
 <main class="container">
   <div id="produtoContainer">
-    <div class="loading-container">
-      <div class="loading-spinner"></div>
-      <p>Carregando comparação de preços...</p>
-    </div>
+    <div class="loading-spinner"></div>
+    <p style="text-align:center; margin-top:16px;">Carregando...</p>
   </div>
 </main>
 
 <script>
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAvPEyw-3ziOOahKMzxrAD_LiiOAkryCbBZxb34Ga-4wH814uHgk8Lc-uowkUhT0N5Q/exec';
-  
+  let modoAtual = 'essencial';
+
+  function carregarModo() {
+    const salvo = localStorage.getItem('precojusto_modo');
+    if (salvo && ['essencial', 'equilibrado', 'completo'].includes(salvo)) {
+      modoAtual = salvo;
+    } else {
+      modoAtual = 'essencial';
+    }
+    document.body.classList.add(`modo-${modoAtual}`);
+  }
+  carregarModo();
+
   async function fetchGAS(action, params = {}) {
     const query = new URLSearchParams({ action, ...params }).toString();
     const url = `${GAS_URL}?${query}`;
@@ -304,79 +97,57 @@
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   }
-  
+
   async function carregarDetalhes() {
     const params = new URLSearchParams(window.location.search);
     const produtoId = params.get('id');
-    
-    if (!produtoId) {
-      window.location.href = 'index.html';
-      return;
-    }
-    
+    if (!produtoId) { window.location.href = 'index.html'; return; }
+
     try {
       const [produtos, dadosPrecos] = await Promise.all([
         fetchGAS('produtos'),
         fetchGAS('precos', { produto: produtoId })
       ]);
-      
       const produto = produtos.find(p => p.id === produtoId);
-      
-      if (!produto) {
-        throw new Error('Produto não encontrado');
-      }
-      
+      if (!produto) throw new Error('Produto não encontrado');
       renderizarDetalhes(produto, dadosPrecos);
     } catch (error) {
-      document.getElementById('produtoContainer').innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Erro ao carregar: ${error.message}</p>
-          <a href="index.html" class="btn-voltar" style="margin-top:20px;">Voltar</a>
-        </div>
-      `;
+      document.getElementById('produtoContainer').innerHTML = `<div style="text-align:center; padding:60px;">Erro: ${error.message}<br><a href="index.html">Voltar</a></div>`;
     }
   }
-  
+
   function renderizarDetalhes(produto, dadosPrecos) {
     const resultados = dadosPrecos.resultados || [];
     const temResultados = resultados.length > 0;
     const melhor = resultados[0];
-    
+    const isEssencial = modoAtual === 'essencial';
+    const isCompleto = modoAtual === 'completo';
+
     let html = `
       <div class="produto-header">
         <span class="produto-categoria">${produto.categoria}</span>
         <h1 class="produto-titulo">${produto.nome_canonico}</h1>
         <p class="produto-embalagem">${produto.embalagem} · Preço por ${produto.unidade_medida || 'kg'}</p>
     `;
-    
     if (temResultados && melhor) {
       const melhorPreco = melhor.resultados[0];
       html += `
         <div class="melhor-preco-destaque">
           <div class="melhor-preco-label">🏆 Melhor preço encontrado</div>
-          <div class="melhor-preco-valor-destaque">
-            R$ ${melhorPreco.preco.toFixed(2).replace('.', ',')}
-          </div>
-          <div style="margin-top: 12px; color: var(--texto-medio);">
-            <i class="fas fa-store"></i> ${melhor.mercado_nome} · 
-            R$ ${melhorPreco.preco_por_unidade?.toFixed(2).replace('.', ',')}/${produto.unidade_medida || 'kg'}
-          </div>
+          <div class="melhor-preco-valor-destaque">R$ ${melhorPreco.preco.toFixed(2).replace('.', ',')}</div>
+          <div style="margin-top: 12px;"><i class="fas fa-store"></i> ${melhor.mercado_nome}</div>
+          ${isCompleto && melhorPreco.preco_por_unidade ? `<div>R$ ${melhorPreco.preco_por_unidade.toFixed(2).replace('.', ',')}/${produto.unidade_medida || 'kg'}</div>` : ''}
         </div>
       `;
     }
-    
     html += `</div>`;
-    
+
     if (temResultados) {
       html += `<div class="mercados-grid">`;
-      
       resultados.forEach((mercado, idx) => {
         const preco = mercado.resultados[0];
         const ehMelhor = idx === 0;
-        const economia = !ehMelhor && melhor ? 
-          (preco.preco - melhor.resultados[0].preco).toFixed(2) : null;
-        
+        const economia = (!ehMelhor && melhor) ? (preco.preco - melhor.resultados[0].preco).toFixed(2) : null;
         html += `
           <div class="mercado-card ${ehMelhor ? 'melhor' : ''}">
             <div class="mercado-header" style="border-left: 4px solid ${mercado.mercado_cor || '#00843D'}">
@@ -385,32 +156,17 @@
               ${ehMelhor ? '<span class="badge-melhor">Melhor</span>' : ''}
             </div>
             <div class="mercado-body">
-              <div class="produto-nome-site">${preco.nome}</div>
               <div class="preco-mercado">
                 R$ ${preco.preco.toFixed(2).replace('.', ',')}
-                ${economia && parseFloat(economia) > 0 ? 
-                  `<span class="economia-badge">+R$ ${economia.replace('.', ',')}</span>` : ''}
+                ${economia && parseFloat(economia) > 0 ? `<span class="economia-badge">+R$ ${economia.replace('.', ',')}</span>` : ''}
               </div>
-              <div class="preco-unidade-mercado">
-                R$ ${preco.preco_por_unidade?.toFixed(2).replace('.', ',')}/${produto.unidade_medida || 'kg'}
-              </div>
-              ${preco.url ? `
-                <a href="${preco.url}" target="_blank" rel="noopener" class="btn-visitar">
-                  Ver no site <i class="fas fa-external-link-alt"></i>
-                </a>
-              ` : ''}
-              ${mercado.resultados.length > 1 ? `
-                <details style="margin-top: 16px; font-size:0.8rem;">
-                  <summary style="cursor:pointer; color: var(--verde);">
-                    +${mercado.resultados.length - 1} outras opções
-                  </summary>
+              ${isCompleto && preco.preco_por_unidade ? `<div class="preco-unidade-mercado">R$ ${preco.preco_por_unidade.toFixed(2).replace('.', ',')}/${produto.unidade_medida || 'kg'}</div>` : ''}
+              ${preco.url ? `<a href="${preco.url}" target="_blank" class="btn-visitar">Ver no site <i class="fas fa-external-link-alt"></i></a>` : ''}
+              ${(!isEssencial && mercado.resultados.length > 1) ? `
+                <details style="margin-top: 16px;">
+                  <summary style="cursor:pointer; color: var(--verde);">+${mercado.resultados.length - 1} outras opções</summary>
                   <ul style="margin-top:12px; list-style:none;">
-                    ${mercado.resultados.slice(1).map(r => `
-                      <li style="padding:6px 0; border-bottom:1px solid var(--cinza-border); display:flex; justify-content:space-between;">
-                        <span>${r.nome.substring(0, 30)}...</span>
-                        <strong>R$ ${r.preco.toFixed(2).replace('.', ',')}</strong>
-                      </li>
-                    `).join('')}
+                    ${mercado.resultados.slice(1).map(r => `<li style="padding:6px 0;">${r.nome.substring(0, 40)}... <strong>R$ ${r.preco.toFixed(2).replace('.', ',')}</strong></li>`).join('')}
                   </ul>
                 </details>
               ` : ''}
@@ -418,28 +174,14 @@
           </div>
         `;
       });
-      
       html += `</div>`;
     } else {
-      html += `
-        <div class="empty-state">
-          <i class="fas fa-clock"></i>
-          <p>Ainda não há preços disponíveis para este produto.</p>
-          <p style="font-size:0.85rem;">O scraper atualiza os preços a cada 6 horas.</p>
-        </div>
-      `;
+      html += `<div style="text-align:center; padding:60px;">Ainda não há preços disponíveis para este produto.</div>`;
     }
-    
-    html += `
-      <div class="ultima-atualizacao">
-        <i class="far fa-clock"></i> 
-        Última atualização: ${new Date(dadosPrecos.consultado_em).toLocaleString('pt-BR')}
-      </div>
-    `;
-    
+    html += `<div class="ultima-atualizacao">🕒 Última atualização: ${new Date(dadosPrecos.consultado_em).toLocaleString('pt-BR')}</div>`;
     document.getElementById('produtoContainer').innerHTML = html;
   }
-  
+
   carregarDetalhes();
 </script>
 </body>
