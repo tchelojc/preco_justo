@@ -16,11 +16,11 @@ jobs:
         with:
           node-version: '20'
       - name: Instalar dependências
-        run: npm init -y && npm install playwright
+        run: npm install playwright
       - name: Instalar navegadores
-        run: npx playwright install chromium --only-shell
+        run: npx playwright install chromium --with-deps
       - name: Executar scraper
-        run: node scraper-playwright.js
+        run: node scraper.js
       - name: Commit e push
         run: |
           git config user.name 'github-actions[bot]'
