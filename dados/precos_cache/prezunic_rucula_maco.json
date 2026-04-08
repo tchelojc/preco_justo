@@ -1,0 +1,33 @@
+{
+  "data_hora": "2026-04-08T04:52:24.469Z",
+  "mercado_id": "prezunic",
+  "mercado_nome": "Prezunic",
+  "mercado_logo": "🛒",
+  "mercado_cor": "#E31E26",
+  "produto_id": "rucula_maco",
+  "produto_nome": "Rúcula",
+  "produto_categoria": "Hortifruti",
+  "resultados": [
+    {
+      "nome": "Rúcula Prezunic Hidropônica",
+      "preco": 3.99,
+      "preco_por_unidade": null,
+      "gtin": "7898552306083",
+      "url": "https://www.prezunic.com.br/rucula-prezunic-hidroponica/p"
+    },
+    {
+      "nome": "Rúcula Flow Pack Unidade",
+      "preco": 8.99,
+      "preco_por_unidade": null,
+      "gtin": "7898267280692",
+      "url": "https://www.prezunic.com.br/rucula-flow-pack-unidade-1887808/p"
+    },
+    {
+      "nome": "Rúcula Natural Salads 90g",
+      "preco": 8.99,
+      "preco_por_unidade": 99.89,
+      "gtin": "7898267258790",
+      "url": "https://www.prezunic.com.br/rucula-natural-salads-90g/p"
+    }
+  ]
+}

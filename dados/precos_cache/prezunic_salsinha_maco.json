@@ -1,0 +1,19 @@
+{
+  "data_hora": "2026-04-08T04:52:27.238Z",
+  "mercado_id": "prezunic",
+  "mercado_nome": "Prezunic",
+  "mercado_logo": "🛒",
+  "mercado_cor": "#E31E26",
+  "produto_id": "salsinha_maco",
+  "produto_nome": "Salsinha",
+  "produto_categoria": "Hortifruti",
+  "resultados": [
+    {
+      "nome": "Salada Gomes da Costa c/ Atum, Batata, Maionese, Azeitonas e SalsinhaLata 165g",
+      "preco": 15.99,
+      "preco_por_unidade": 96.91,
+      "gtin": "7891167014015",
+      "url": "https://www.prezunic.com.br/salada-gomes-da-costa-c--atum--batata--maionese--azeitonas-e-salsinhalata-165g/p"
+    }
+  ]
+}

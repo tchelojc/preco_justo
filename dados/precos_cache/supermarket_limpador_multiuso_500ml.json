@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-04-08T05:01:06.095Z",
+  "mercado_id": "supermarket",
+  "mercado_nome": "Super Market",
+  "mercado_logo": "🏬",
+  "mercado_cor": "#006400",
+  "produto_id": "limpador_multiuso_500ml",
+  "produto_nome": "Limpador Multiuso",
+  "produto_categoria": "Limpeza",
+  "resultados": []
+}

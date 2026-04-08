@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-04-08T04:58:58.476Z",
+  "mercado_id": "supermarket",
+  "mercado_nome": "Super Market",
+  "mercado_logo": "🏬",
+  "mercado_cor": "#006400",
+  "produto_id": "peixe_tilapia_kg",
+  "produto_nome": "Filé de Tilápia",
+  "produto_categoria": "Peixes",
+  "resultados": []
+}

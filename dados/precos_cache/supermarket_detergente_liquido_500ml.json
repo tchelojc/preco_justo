@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-04-08T05:00:55.421Z",
+  "mercado_id": "supermarket",
+  "mercado_nome": "Super Market",
+  "mercado_logo": "🏬",
+  "mercado_cor": "#006400",
+  "produto_id": "detergente_liquido_500ml",
+  "produto_nome": "Detergente Líquido",
+  "produto_categoria": "Limpeza",
+  "resultados": []
+}

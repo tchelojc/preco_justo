@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-04-08T05:00:49.229Z",
+  "mercado_id": "supermarket",
+  "mercado_nome": "Super Market",
+  "mercado_logo": "🏬",
+  "mercado_cor": "#006400",
+  "produto_id": "manga_kg",
+  "produto_nome": "Manga Tommy",
+  "produto_categoria": "Hortifruti",
+  "resultados": []
+}

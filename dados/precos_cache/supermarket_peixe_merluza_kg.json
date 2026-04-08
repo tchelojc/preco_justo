@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-04-08T04:59:00.413Z",
+  "mercado_id": "supermarket",
+  "mercado_nome": "Super Market",
+  "mercado_logo": "🏬",
+  "mercado_cor": "#006400",
+  "produto_id": "peixe_merluza_kg",
+  "produto_nome": "Filé de Merluza",
+  "produto_categoria": "Peixes",
+  "resultados": []
+}

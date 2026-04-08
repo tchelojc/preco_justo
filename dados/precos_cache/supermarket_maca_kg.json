@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-04-08T05:00:43.135Z",
+  "mercado_id": "supermarket",
+  "mercado_nome": "Super Market",
+  "mercado_logo": "🏬",
+  "mercado_cor": "#006400",
+  "produto_id": "maca_kg",
+  "produto_nome": "Maçã Gala",
+  "produto_categoria": "Hortifruti",
+  "resultados": []
+}

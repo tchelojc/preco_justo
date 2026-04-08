@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-04-08T05:00:24.337Z",
+  "mercado_id": "supermarket",
+  "mercado_nome": "Super Market",
+  "mercado_logo": "🏬",
+  "mercado_cor": "#006400",
+  "produto_id": "couve_flor_kg",
+  "produto_nome": "Couve-flor",
+  "produto_categoria": "Hortifruti",
+  "resultados": []
+}
