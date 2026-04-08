@@ -1,26 +1,180 @@
 /**
  * =============================================================
- * PREÇO JUSTO — Frontend App (versão colaborativa)
+ * PREÇO JUSTO — Frontend App (colaborativo)
  * =============================================================
- * Comunicação com o backend via integracao.js
+ * Comunicação direta com o backend GAS (colaborativo)
  * Usuários enviam preços com foto → dados salvos no Drive
  * =============================================================
  */
 
-// A URL do backend já está configurada dentro do integracao.js
-// Não precisamos mais da constante GAS_URL aqui
+// ========== CONFIGURAÇÃO ==========
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzOc79mQE9BP2h1LH6wzpkIpwPoVBSlqIlpYPUKhDzl1BVU6JUJiG4PvdYfmYXYyq3V/exec';
+const IMGBB_API_KEY = '2597fbdd4014975ed01d56ee9a6b404d'; // sua chave
 
-// ─── Estado Global ───────────────────────────────────────────
+// ========== ESTADO GLOBAL ==========
 let STATE = {
   produtos:       [],
   mercados:       [],
   produtoAtual:   null,
-  resultados:     [],     // array no formato esperado pelo render
+  resultados:     [],
   carregando:     false,
   ultimaAtualizacao: null
 };
 
-// ─── Inicialização ───────────────────────────────────────────
+// ========== FUNÇÕES DE COMUNICAÇÃO COM O BACKEND ==========
+
+/**
+ * Requisição GET para o backend
+ */
+async function fetchGET(action, params = {}) {
+  const query = new URLSearchParams({ action, ...params }).toString();
+  const url = `${BACKEND_URL}?${query}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if (json.erro) throw new Error(json.erro);
+  return json;
+}
+
+/**
+ * Requisição POST para o backend (envio de preço)
+ */
+async function fetchPOST(acao, dados) {
+  const formData = new URLSearchParams();
+  formData.append('data', JSON.stringify({ acao, dados }));
+  const res = await fetch(BACKEND_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: formData.toString()
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.erro || 'Erro no servidor');
+  return json;
+}
+
+// ========== FUNÇÕES DE NEGÓCIO (BACKEND) ==========
+
+async function listarProdutos() {
+  return await fetchGET('produtos');
+}
+
+async function listarMercados() {
+  return await fetchGET('mercados');
+}
+
+async function obterPrecoDestaque(produtoId, mercadoId) {
+  return await fetchGET('preco_destaque', { produto: produtoId, mercado: mercadoId });
+}
+
+async function salvarPreco(dados) {
+  return await fetchPOST('enviar_preco', dados);
+}
+
+// ========== FUNÇÕES DE UPLOAD DE IMAGEM (ImgBB) ==========
+
+/**
+ * Comprime uma imagem (base64) e retorna via callback
+ */
+function compressImage(base64, maxWidth = 800, quality = 0.7, callback) {
+  const img = new Image();
+  img.onload = () => {
+    let width = img.width;
+    let height = img.height;
+    if (width > maxWidth) {
+      height = (height * maxWidth) / width;
+      width = maxWidth;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+    callback(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = base64;
+}
+
+/**
+ * Faz upload de uma imagem para ImgBB e retorna a URL pública
+ */
+async function uploadParaImgBB(base64Image) {
+  let imageData = base64Image;
+  if (base64Image.includes(',')) {
+    imageData = base64Image.split(',')[1];
+  }
+  const formData = new FormData();
+  formData.append('key', IMGBB_API_KEY);
+  formData.append('image', imageData);
+  const response = await fetch('https://api.imgbb.com/1/upload', {
+    method: 'POST',
+    body: formData
+  });
+  const result = await response.json();
+  if (result.success) {
+    return result.data.url;
+  } else {
+    throw new Error(result.error?.message || 'Falha no upload');
+  }
+}
+
+/**
+ * Upload de arquivo de imagem (File) para ImgBB
+ */
+async function uploadImageToHost(file, maxWidth = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    if (file.size > 5 * 1024 * 1024) {
+      reject(new Error('Imagem muito grande. Máximo 5MB.'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      compressImage(ev.target.result, maxWidth, quality, async (compressedBase64) => {
+        try {
+          const url = await uploadParaImgBB(compressedBase64);
+          resolve(url);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    };
+    reader.onerror = () => reject(new Error('Erro ao ler o arquivo'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ========== FUNÇÕES DE SESSÃO (opcional, para identificar usuário) ==========
+function obterSessao() {
+  const raw = localStorage.getItem('precojusto_sessao');
+  if (!raw) return null;
+  try {
+    const s = JSON.parse(raw);
+    if (!s.autenticado || !s.expira || Date.now() > s.expira) {
+      localStorage.removeItem('precojusto_sessao');
+      return null;
+    }
+    return s;
+  } catch (e) {
+    return null;
+  }
+}
+
+function salvarSessao(email, nome) {
+  const sess = {
+    email: email,
+    nome: nome,
+    autenticado: true,
+    expira: Date.now() + 8 * 3600000
+  };
+  localStorage.setItem('precojusto_sessao', JSON.stringify(sess));
+}
+
+function limparSessao() {
+  localStorage.removeItem('precojusto_sessao');
+}
+
+// ========== LÓGICA PRINCIPAL DO APP ==========
+
 document.addEventListener('DOMContentLoaded', () => {
   inicializar();
 
@@ -38,13 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/**
- * Carrega produtos e mercados diretamente do backend (via integracao.js)
- */
 async function inicializar() {
   mostrarLoading('Carregando catálogo de produtos…');
   try {
-    // As funções listarProdutos e listarMercados vêm do integracao.js
     const [produtos, mercados] = await Promise.all([
       listarProdutos(),
       listarMercados()
@@ -56,7 +206,6 @@ async function inicializar() {
     popularSelectProdutos(produtos);
     renderizarMercadosChip(STATE.mercados);
 
-    // Busca o primeiro produto automaticamente
     if (produtos.length > 0) {
       document.getElementById('select-produto').value = produtos[0].id;
       await buscarPrecos(produtos[0].id);
@@ -67,12 +216,6 @@ async function inicializar() {
   }
 }
 
-// ─── API Calls (via integracao.js) ───────────────────────────
-
-/**
- * Busca os preços de um produto (para todos os mercados) e monta a estrutura
- * que o render espera: { resultados: [ { mercado_id, mercado_nome, mercado_logo, mercado_cor, resultados: [ { preco, nome, fotoUrl, dataHora } ] } ] }
- */
 async function buscarPrecos(produtoId) {
   STATE.produtoAtual = produtoId;
   const produto = STATE.produtos.find(p => p.id === produtoId);
@@ -80,7 +223,6 @@ async function buscarPrecos(produtoId) {
   mostrarLoading(`Buscando preços de ${produto?.nome_canonico || produtoId}…`);
 
   try {
-    // Para cada mercado, obtém o preço destaque (se houver)
     const promessas = STATE.mercados.map(async mercado => {
       const precoDestaque = await obterPrecoDestaque(produtoId, mercado.id);
       if (!precoDestaque) return null;
@@ -92,20 +234,17 @@ async function buscarPrecos(produtoId) {
         resultados: [{
           preco: precoDestaque.preco,
           nome: produto.nome_canonico,
-          preco_por_unidade: null, // pode ser calculado se tiver embalagem
+          preco_por_unidade: null,
           fotoUrl: precoDestaque.fotoUrl,
           dataHora: precoDestaque.dataHora,
-          url: null // não temos URL do produto no site
+          url: null
         }]
       };
     });
 
     let resultados = (await Promise.all(promessas)).filter(r => r !== null);
-
-    // Ordena por preço crescente
     resultados.sort((a, b) => a.resultados[0].preco - b.resultados[0].preco);
 
-    // Atualiza a data da última atualização (mais recente entre os preços)
     const datas = resultados.flatMap(r => r.resultados.map(rr => new Date(rr.dataHora)));
     if (datas.length) {
       const maisRecente = new Date(Math.max(...datas));
@@ -122,18 +261,13 @@ async function buscarPrecos(produtoId) {
   }
 }
 
-// ─── Renderização (mantida igual à original, com pequenos ajustes) ───
-
 function popularSelectProdutos(produtos) {
   const select = document.getElementById('select-produto');
   select.innerHTML = '';
-
   const categorias = [...new Set(produtos.map(p => p.categoria))];
-
   for (const cat of categorias) {
     const group = document.createElement('optgroup');
     group.label = cat;
-
     produtos
       .filter(p => p.categoria === cat)
       .forEach(p => {
@@ -142,7 +276,6 @@ function popularSelectProdutos(produtos) {
         opt.textContent = `${p.nome_canonico} ${p.embalagem}`;
         group.appendChild(opt);
       });
-
     select.appendChild(group);
   }
 }
@@ -150,7 +283,6 @@ function popularSelectProdutos(produtos) {
 function renderizarMercadosChip(mercados) {
   const container = document.getElementById('chips-mercados');
   container.innerHTML = '';
-
   mercados.forEach(m => {
     const chip = document.createElement('span');
     chip.className = 'chip-mercado';
@@ -160,11 +292,6 @@ function renderizarMercadosChip(mercados) {
   });
 }
 
-/**
- * Renderiza os cards de comparação
- * Agora inclui um botão "Ajudar com preço" (visível apenas em modos adequados)
- * e exibe a data da última atualização do preço.
- */
 function renderizarResultados(produto, dados) {
   const container = document.getElementById('resultados');
   const resultados = dados.resultados || [];
@@ -194,10 +321,8 @@ function renderizarResultados(produto, dados) {
   resultados.forEach((item, idx) => {
     const top = item.resultados[0];
     if (!top) return;
-
-    const ehMelhor   = idx === 0;
+    const ehMelhor = idx === 0;
     const economiaReais = melhorPreco ? (top.preco - melhorPreco).toFixed(2) : null;
-    const economia   = economiaReais > 0 ? `+R$ ${economiaReais}` : null;
     const dataPreco = top.dataHora ? formatarData(top.dataHora) : 'data desconhecida';
 
     html += `
@@ -206,15 +331,11 @@ function renderizarResultados(produto, dados) {
         <div class="card-topo">
           <span class="logo-mercado">${item.mercado_logo}</span>
           <div class="nome-mercado">${item.mercado_nome}</div>
-          ${economia ? `<div class="economia-badge">+R$ ${economiaReais} a mais</div>` : ''}
+          ${economiaReais ? `<div class="economia-badge">+R$ ${economiaReais} a mais</div>` : ''}
         </div>
         <div class="card-corpo">
           <div class="nome-produto-site">${top.nome}</div>
           <div class="preco-grande">R$ ${top.preco.toFixed(2).replace('.', ',')}</div>
-          ${top.preco_por_unidade ? `
-            <div class="preco-unidade">
-              R$ ${top.preco_por_unidade.toFixed(2).replace('.', ',')}/${produto?.unidade_medida || 'kg'}
-            </div>` : ''}
           <div class="small-text" style="margin-top: 6px;">
             <i class="far fa-clock"></i> Atualizado em ${dataPreco}
           </div>
@@ -231,7 +352,6 @@ function renderizarResultados(produto, dados) {
   html += '</div>';
   container.innerHTML = html;
 
-  // Adiciona eventos para os botões de ajuda
   document.querySelectorAll('.btn-ajudar').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -242,7 +362,6 @@ function renderizarResultados(produto, dados) {
     });
   });
 
-  // Animação de entrada
   requestAnimationFrame(() => {
     document.querySelectorAll('.card-mercado').forEach((card, i) => {
       card.style.animationDelay = `${i * 60}ms`;
@@ -251,20 +370,20 @@ function renderizarResultados(produto, dados) {
   });
 }
 
-// ─── Modal para envio de preço (colaboração) ─────────────────
-
-/**
- * Abre um modal simples (ou usa prompt) para o usuário informar o preço e a foto.
- * Utiliza as funções do integracao.js (uploadImageToHost, salvarPreco, etc.)
- */
 async function abrirModalEnvioPreco(produtoId, mercadoId, mercadoNome) {
-  // Verifica se o usuário está logado (opcional)
-  const sess = obterSessao(); // função do integracao.js
-  if (!sess) {
-    if (confirm('Você não está logado. Deseja fazer login para colaborar?')) {
-      window.location.href = 'marido_aluguel.html'; // ou página de login
-    } else {
-      // Permite envio anônimo? Vamos permitir, mas registrar como anônimo.
+  // Identificação do usuário (opcional, pode ser anônimo)
+  let usuarioId = 'anonimo';
+  let usuarioNome = 'Anônimo';
+  const sess = obterSessao();
+  if (sess) {
+    usuarioId = sess.email;
+    usuarioNome = sess.nome;
+  } else {
+    const nome = prompt('Para colaborar, informe seu nome (ou clique em Cancelar para continuar anônimo):');
+    if (nome && nome.trim()) {
+      usuarioNome = nome.trim();
+      salvarSessao(usuarioNome + '@anonimo', usuarioNome);
+      usuarioId = usuarioNome + '@anonimo';
     }
   }
 
@@ -276,7 +395,7 @@ async function abrirModalEnvioPreco(produtoId, mercadoId, mercadoNome) {
     return;
   }
 
-  // Solicitar foto da etiqueta
+  // Solicitar foto
   const inputFoto = document.createElement('input');
   inputFoto.type = 'file';
   inputFoto.accept = 'image/*';
@@ -287,23 +406,20 @@ async function abrirModalEnvioPreco(produtoId, mercadoId, mercadoNome) {
       alert('Imagem muito grande. Máximo 5MB.');
       return;
     }
-    mostrarLoading('Enviando foto...');
+    mostrarLoading('Enviando foto e preço...');
     try {
-      // Usa a função do integracao.js para fazer upload para ImgBB
       const imageUrl = await uploadImageToHost(file, 800, 0.7);
-      // Prepara dados para salvar no backend
       const dadosEnvio = {
         produtoId,
         mercadoId,
         preco: precoNum,
         fotoUrl: imageUrl,
-        usuarioId: sess?.usuarioId || 'anonimo',
-        usuarioNome: sess?.email || 'Anônimo'
+        usuarioId,
+        usuarioNome
       };
       const resultado = await salvarPreco(dadosEnvio);
       if (resultado && resultado.ok) {
         alert(`Preço enviado com sucesso! Obrigado pela colaboração.`);
-        // Recarrega os preços do produto atual
         if (STATE.produtoAtual === produtoId) {
           await buscarPrecos(produtoId);
         }
@@ -313,18 +429,12 @@ async function abrirModalEnvioPreco(produtoId, mercadoId, mercadoNome) {
     } catch (err) {
       console.error(err);
       alert('Erro ao enviar preço: ' + err.message);
-    } finally {
-      // Fecha loading
-      document.getElementById('resultados').innerHTML = ''; // limpa mensagem de loading
-      await buscarPrecos(produtoId); // recarrega
     }
   };
   inputFoto.click();
 }
 
-// ─── Estados de UI (mantidos) ────────────────────────────────
-
-function mostrarLoading(msg = 'Carregando…') {
+function mostrarLoading(msg) {
   const container = document.getElementById('resultados');
   if (container) {
     container.innerHTML = `
