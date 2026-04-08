@@ -421,7 +421,8 @@
 
 <script>
   // ========== CONFIGURAÇÃO ==========
-  const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJNABfam_giz6aSyWZ3Cd-iKjkLAXQEE-mMZvBiWS-t21R88SGNYTr4RnJApcdEDwEIA/exec';
+  // URL ATUALIZADA para a nova implantação que contém o endpoint 'todos_precos_destaque'
+  const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwr_88m_9nTlY4Om2zZV_MbRipepSDzaB5dkDie0cVVB-oSWOnTLJzlmtIGCv0EDZsUlw/exec';
   const IMGBB_API_KEY = '2597fbdd4014975ed01d56ee9a6b404d';
 
   // ========== TOAST ==========
@@ -458,7 +459,7 @@
   // ========== ESTADO GLOBAL ==========
   let todosProdutos = [];
   let todosMercados = [];
-  let precosPorProdutoMercado = {};
+  let precosPorProdutoMercado = {};  // chave "produtoId|mercadoId" -> objeto preco (destaque)
   let mercadoAtivo = null;
   let ordenacao = 'menor_preco';
   let modoAtual = 'essencial';
@@ -488,11 +489,12 @@
 
   async function listarProdutos() { return await fetchGET('produtos'); }
   async function listarMercados() { return await fetchGET('mercados'); }
-  async function obterPrecoDestaque(produtoId, mercadoId) {
-    try {
-      return await fetchGET('preco_destaque', { produto: produtoId, mercado: mercadoId });
-    } catch (e) { return null; }
+  
+  // NOVA FUNÇÃO: busca todos os preços destaque de uma só vez
+  async function listarTodosPrecosDestaque() {
+    return await fetchGET('todos_precos_destaque');
   }
+
   async function salvarPreco(dados) { return await fetchPOST('enviar_preco', dados); }
 
   // ========== UPLOAD IMAGEM ==========
@@ -534,40 +536,39 @@
     });
   }
 
+  // ========== CARREGAMENTO PRINCIPAL (CORRIGIDO) ==========
   async function carregarDadosIniciais() {
     try {
-      const [produtos, mercados] = await Promise.all([listarProdutos(), listarMercados()]);
+      // Carrega produtos, mercados e TODOS os preços destaque em paralelo
+      const [produtos, mercados, todosPrecos] = await Promise.all([
+        listarProdutos(),
+        listarMercados(),
+        listarTodosPrecosDestaque()
+      ]);
       todosProdutos = produtos;
-      todosMercados = mercados.filter(m => m.ativo);
-      // Carrega todos os preços destaque
-      precosPorProdutoMercado = {};
-      for (const produto of todosProdutos) {
-        for (const mercado of todosMercados) {
-          const preco = await obterPrecoDestaque(produto.id, mercado.id);
-          if (preco) {
-            precosPorProdutoMercado[`${produto.id}|${mercado.id}`] = preco;
-          }
-        }
-      }
+      todosMercados = mercados.filter(m => m.ativo !== false);
+      // todosPrecos é um objeto: { "produtoId|mercadoId": { preco, fotoUrl, dataHora, ... } }
+      precosPorProdutoMercado = todosPrecos || {};
+
       renderizarAbasMercados();
       renderizarProdutos();
       atualizarStats();
     } catch (err) {
       console.error(err);
       document.getElementById('produtosContainer').innerHTML = '<div style="text-align:center; padding:60px;">⚠️ Erro ao carregar. Tente recarregar.</div>';
-      // Fallback: mercados completos (para as abas aparecerem)
-      todosMercados = [
-        { id: "guanabara", nome: "Guanabara", logo: "🛍️", cor: "#FF8C00", ativo: true },
-        { id: "paodeacucar", nome: "Pão de Açúcar", logo: "🔴", cor: "#CC0000", ativo: true },
-        { id: "atacadao", nome: "Atacadão", logo: "📦", cor: "#FFD700", ativo: true },
-        { id: "prezunic", nome: "Prezunic", logo: "🛒", cor: "#E31E26", ativo: true },
-        { id: "mundial", nome: "Mundial", logo: "🏪", cor: "#0066CC", ativo: true },
-        { id: "supermarket", nome: "Super Market", logo: "🏬", cor: "#006400", ativo: true },
-        { id: "hortifruti", nome: "Hortifruti", logo: "🥦", cor: "#2E8B57", ativo: true }
-      ];
-      todosProdutos = []; // sem produtos, mas abas aparecem
-      renderizarAbasMercados();
-      renderizarProdutos(); // exibirá "Nenhum produto encontrado"
+      // Fallback para abas mesmo sem backend
+      if (!todosMercados.length) {
+        todosMercados = [
+          { id: "guanabara", nome: "Guanabara", logo: "🛍️", cor: "#FF8C00", ativo: true },
+          { id: "paodeacucar", nome: "Pão de Açúcar", logo: "🔴", cor: "#CC0000", ativo: true },
+          { id: "atacadao", nome: "Atacadão", logo: "📦", cor: "#FFD700", ativo: true },
+          { id: "prezunic", nome: "Prezunic", logo: "🛒", cor: "#E31E26", ativo: true },
+          { id: "mundial", nome: "Mundial", logo: "🏪", cor: "#0066CC", ativo: true },
+          { id: "supermarket", nome: "Super Market", logo: "🏬", cor: "#006400", ativo: true },
+          { id: "hortifruti", nome: "Hortifruti", logo: "🥦", cor: "#2E8B57", ativo: true }
+        ];
+        renderizarAbasMercados();
+      }
     }
   }
 
@@ -653,13 +654,16 @@
     const mostrarBotaoAjudar = (modoAtual === 'equilibrado' || modoAtual === 'completo');
     const limite = isEssencial ? 15 : 60;
 
-    const html = `<div class="produtos-grid">${produtosComPreco.slice(0, limite).map(({ produto, precoInfo }) => {
+    let html = `<div class="produtos-grid">`;
+    for (let i = 0; i < Math.min(produtosComPreco.length, limite); i++) {
+      const { produto, precoInfo } = produtosComPreco[i];
       const temPreco = precoInfo !== null;
       const precoStr = temPreco ? `R$ ${precoInfo.preco.toFixed(2).replace('.',',')}` : '--';
       const mercadoNome = temPreco ? precoInfo.mercado_nome : 'Aguardando';
       const dataPreco = temPreco && precoInfo.dataHora ? new Date(precoInfo.dataHora).toLocaleString('pt-BR') : '';
       const fotoUrl = temPreco ? precoInfo.fotoUrl : null;
-      // Cálculo simples de preço por unidade (assumindo que a embalagem contém número)
+      
+      // Cálculo de preço por unidade (modo completo)
       let precoPorKg = '';
       if (isCompleto && temPreco) {
         const pesoMatch = produto.embalagem.match(/(\d+(?:[.,]\d+)?)/);
@@ -676,7 +680,8 @@
           }
         }
       }
-      return `
+
+      html += `
         <div class="produto-card">
           <div class="card-categoria">${produto.categoria}</div>
           <div class="card-nome">${produto.nome_canonico}</div>
@@ -690,7 +695,8 @@
           ${mostrarBotaoAjudar ? `<button class="btn-ajudar" data-produto='${JSON.stringify(produto)}' data-mercados='${JSON.stringify(todosMercados)}'>📸 Ajudar com preço</button>` : ''}
         </div>
       `;
-    }).join('')}</div>`;
+    }
+    html += `</div>`;
     container.innerHTML = html;
 
     document.querySelectorAll('.btn-ajudar').forEach(btn => {
@@ -772,7 +778,11 @@
         else msg += ` Próxima atualização permitida ${janela.texto}.`;
         toast(msg, 'success');
         document.getElementById('modalEnvioPreco').style.display = 'none';
-        await carregarDadosIniciais(); // recarrega tudo
+        // Recarrega todos os preços novamente
+        const novosPrecos = await listarTodosPrecosDestaque();
+        precosPorProdutoMercado = novosPrecos || {};
+        renderizarProdutos();
+        atualizarStats();
       } else throw new Error(resultado.erro);
     } catch (err) {
       console.error(err);
@@ -842,6 +852,7 @@
     renderizarProdutos();
   });
 
+  // Campo de busca (adicionado dinamicamente como no original)
   const searchDiv = document.createElement('div');
   searchDiv.style.cssText = 'flex:1; max-width:400px;';
   searchDiv.innerHTML = `<input type="text" id="searchProduto" placeholder="🔍 Buscar produto..." style="width:100%; padding:12px 20px; border-radius:40px; border:none;">`;
