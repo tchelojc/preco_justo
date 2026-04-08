@@ -1,6 +1,26 @@
 {
-  "data_geracao": "2026-04-07T22:00:00.000Z",
-  "mercados": ["prezunic", "guanabara", "mundial", "supermarket", "paodeacucar"],
-  "produtos": ["arroz_tipo1_5kg", "feijao_carioca_1kg", "leite_integral_1l"],
-  "total_arquivos": 15
+  "atualizado_em": "2026-04-08T06:35:58.649Z",
+  "mercados": [
+    "mundial",
+    "guanabara",
+    "hortifruti"
+  ],
+  "produtos": [
+    "arroz_tipo1_5kg",
+    "feijao_carioca_1kg",
+    "leite_integral_1l",
+    "oleo_soja_900ml",
+    "acucar_cristal_1kg",
+    "cafe_torrado_500g",
+    "frango_peito_kg",
+    "frango_coxa_kg",
+    "alcatra_kg",
+    "ovos_brancos_dz",
+    "macarrao_espaguete_500g",
+    "manteiga_200g",
+    "tomate_kg",
+    "batata_kg",
+    "banana_kg"
+  ],
+  "total_arquivos": 45
 }
