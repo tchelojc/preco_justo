@@ -1,26 +1,21 @@
 /**
  * =============================================================
- * COMPARADOR RJ — Frontend App
- * Comunicação entre HTML ↔ GAS ↔ GitHub JSON
+ * PREÇO JUSTO — Frontend App (versão colaborativa)
  * =============================================================
- *
- * ⚠️  CONFIGURAÇÃO: Substitua GAS_URL abaixo pela URL do seu
- *     deploy no Google Apps Script após publicar o Codigo.gs
+ * Comunicação com o backend via integracao.js
+ * Usuários enviam preços com foto → dados salvos no Drive
  * =============================================================
  */
 
-// Use EXATAMENTE a URL que você acabou de testar
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx31xp2yYuA8NB_M4E1jjcOiDdB3lQsxoOv2tWyQqBJWXwUhmy89LD9fePyJipos_rjnQ/exec';
-
-// Fallback direto no GitHub (caso GAS esteja fora ou em deploy novo)
-const GITHUB_RAW = 'https://raw.githubusercontent.com/tchelojc/preco_justo/main/dados';
+// A URL do backend já está configurada dentro do integracao.js
+// Não precisamos mais da constante GAS_URL aqui
 
 // ─── Estado Global ───────────────────────────────────────────
 let STATE = {
   produtos:       [],
   mercados:       [],
   produtoAtual:   null,
-  resultados:     [],
+  resultados:     [],     // array no formato esperado pelo render
   carregando:     false,
   ultimaAtualizacao: null
 };
@@ -43,19 +38,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+/**
+ * Carrega produtos e mercados diretamente do backend (via integracao.js)
+ */
 async function inicializar() {
   mostrarLoading('Carregando catálogo de produtos…');
   try {
+    // As funções listarProdutos e listarMercados vêm do integracao.js
     const [produtos, mercados] = await Promise.all([
-      fetchGAS('produtos'),
-      fetchGAS('mercados')
+      listarProdutos(),
+      listarMercados()
     ]);
 
     STATE.produtos = produtos;
-    STATE.mercados = mercados;
+    STATE.mercados = mercados.filter(m => m.ativo !== false);
 
     popularSelectProdutos(produtos);
-    renderizarMercadosChip(mercados);
+    renderizarMercadosChip(STATE.mercados);
 
     // Busca o primeiro produto automaticamente
     if (produtos.length > 0) {
@@ -63,40 +62,67 @@ async function inicializar() {
       await buscarPrecos(produtos[0].id);
     }
   } catch (err) {
-    mostrarErro('Erro ao inicializar. Verifique se o GAS está configurado corretamente.', err);
+    console.error(err);
+    mostrarErro('Erro ao inicializar. Verifique se o backend está ativo.', err);
   }
 }
 
-// ─── API Calls ───────────────────────────────────────────────
+// ─── API Calls (via integracao.js) ───────────────────────────
 
-async function fetchGAS(action, params = {}) {
-  const query = new URLSearchParams({ action, ...params }).toString();
-  const url   = `${GAS_URL}?${query}`;
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`GAS retornou ${res.status}`);
-  const json = await res.json();
-  if (json.erro) throw new Error(json.erro);
-  return json;
-}
-
-async function buscarPrecos(produtoId, forcar = false) {
+/**
+ * Busca os preços de um produto (para todos os mercados) e monta a estrutura
+ * que o render espera: { resultados: [ { mercado_id, mercado_nome, mercado_logo, mercado_cor, resultados: [ { preco, nome, fotoUrl, dataHora } ] } ] }
+ */
+async function buscarPrecos(produtoId) {
   STATE.produtoAtual = produtoId;
   const produto = STATE.produtos.find(p => p.id === produtoId);
 
-  mostrarLoading(`Buscando preços de ${produto?.nome_canonico || produtoId} nos mercados do Rio…`);
+  mostrarLoading(`Buscando preços de ${produto?.nome_canonico || produtoId}…`);
 
   try {
-    const dados = await fetchGAS('precos', { produto: produtoId });
-    STATE.resultados = dados.resultados || [];
-    STATE.ultimaAtualizacao = dados.consultado_em;
-    renderizarResultados(produto, dados);
+    // Para cada mercado, obtém o preço destaque (se houver)
+    const promessas = STATE.mercados.map(async mercado => {
+      const precoDestaque = await obterPrecoDestaque(produtoId, mercado.id);
+      if (!precoDestaque) return null;
+      return {
+        mercado_id: mercado.id,
+        mercado_nome: mercado.nome,
+        mercado_logo: mercado.logo,
+        mercado_cor: mercado.cor,
+        resultados: [{
+          preco: precoDestaque.preco,
+          nome: produto.nome_canonico,
+          preco_por_unidade: null, // pode ser calculado se tiver embalagem
+          fotoUrl: precoDestaque.fotoUrl,
+          dataHora: precoDestaque.dataHora,
+          url: null // não temos URL do produto no site
+        }]
+      };
+    });
+
+    let resultados = (await Promise.all(promessas)).filter(r => r !== null);
+
+    // Ordena por preço crescente
+    resultados.sort((a, b) => a.resultados[0].preco - b.resultados[0].preco);
+
+    // Atualiza a data da última atualização (mais recente entre os preços)
+    const datas = resultados.flatMap(r => r.resultados.map(rr => new Date(rr.dataHora)));
+    if (datas.length) {
+      const maisRecente = new Date(Math.max(...datas));
+      STATE.ultimaAtualizacao = maisRecente.toISOString();
+    } else {
+      STATE.ultimaAtualizacao = null;
+    }
+
+    STATE.resultados = resultados;
+    renderizarResultados(produto, { resultados });
   } catch (err) {
+    console.error(err);
     mostrarErro('Não foi possível buscar os preços. Tente novamente.', err);
   }
 }
 
-// ─── Renderização ─────────────────────────────────────────────
+// ─── Renderização (mantida igual à original, com pequenos ajustes) ───
 
 function popularSelectProdutos(produtos) {
   const select = document.getElementById('select-produto');
@@ -125,7 +151,7 @@ function renderizarMercadosChip(mercados) {
   const container = document.getElementById('chips-mercados');
   container.innerHTML = '';
 
-  mercados.filter(m => m.ativo).forEach(m => {
+  mercados.forEach(m => {
     const chip = document.createElement('span');
     chip.className = 'chip-mercado';
     chip.style.borderColor = m.cor;
@@ -134,8 +160,13 @@ function renderizarMercadosChip(mercados) {
   });
 }
 
+/**
+ * Renderiza os cards de comparação
+ * Agora inclui um botão "Ajudar com preço" (visível apenas em modos adequados)
+ * e exibe a data da última atualização do preço.
+ */
 function renderizarResultados(produto, dados) {
-  const container  = document.getElementById('resultados');
+  const container = document.getElementById('resultados');
   const resultados = dados.resultados || [];
 
   if (resultados.length === 0) {
@@ -143,7 +174,7 @@ function renderizarResultados(produto, dados) {
       <div class="estado-vazio">
         <span class="icone-vazio">🔍</span>
         <p>Nenhum preço encontrado para este produto ainda.</p>
-        <p class="hint">O scraper roda a cada 6 horas via GitHub Actions.</p>
+        <p class="hint">Seja o primeiro a ajudar! Envie um preço com foto da etiqueta.</p>
       </div>`;
     return;
   }
@@ -154,7 +185,7 @@ function renderizarResultados(produto, dados) {
     <div class="resumo-header">
       <h2 class="produto-titulo">${produto?.nome_canonico} <span class="embalagem">${produto?.embalagem}</span></h2>
       <div class="badges">
-        <span class="badge-mercados">${resultados.length} mercados comparados</span>
+        <span class="badge-mercados">${resultados.length} mercados com preço</span>
         ${STATE.ultimaAtualizacao ? `<span class="badge-hora">📅 ${formatarData(STATE.ultimaAtualizacao)}</span>` : ''}
       </div>
     </div>
@@ -165,9 +196,9 @@ function renderizarResultados(produto, dados) {
     if (!top) return;
 
     const ehMelhor   = idx === 0;
-    const ehSegundo  = idx === 1;
     const economiaReais = melhorPreco ? (top.preco - melhorPreco).toFixed(2) : null;
     const economia   = economiaReais > 0 ? `+R$ ${economiaReais}` : null;
+    const dataPreco = top.dataHora ? formatarData(top.dataHora) : 'data desconhecida';
 
     html += `
       <div class="card-mercado ${ehMelhor ? 'card-melhor' : ''}" style="--cor-mercado: ${item.mercado_cor}">
@@ -184,26 +215,34 @@ function renderizarResultados(produto, dados) {
             <div class="preco-unidade">
               R$ ${top.preco_por_unidade.toFixed(2).replace('.', ',')}/${produto?.unidade_medida || 'kg'}
             </div>` : ''}
-          ${item.resultados.length > 1 ? `
-            <details class="outras-opcoes">
-              <summary>Ver ${item.resultados.length - 1} outra(s) opção(ões)</summary>
-              <ul>
-                ${item.resultados.slice(1).map(r => `
-                  <li>
-                    <span class="op-nome">${r.nome}</span>
-                    <span class="op-preco">R$ ${r.preco.toFixed(2).replace('.', ',')}</span>
-                  </li>`).join('')}
-              </ul>
-            </details>` : ''}
+          <div class="small-text" style="margin-top: 6px;">
+            <i class="far fa-clock"></i> Atualizado em ${dataPreco}
+          </div>
+          ${top.fotoUrl ? `<a href="${top.fotoUrl}" target="_blank" class="link-foto" style="font-size:0.7rem;">📸 Ver comprovante</a>` : ''}
         </div>
-        ${top.url ? `<a class="link-produto" href="${top.url}" target="_blank" rel="noopener">Ver no site →</a>` : ''}
+        <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+          <button class="btn-ajudar" data-produto="${produto.id}" data-mercado="${item.mercado_id}" data-mercado-nome="${item.mercado_nome}">
+            <i class="fas fa-camera"></i> Ajudar com preço
+          </button>
+        </div>
       </div>`;
   });
 
   html += '</div>';
   container.innerHTML = html;
 
-  // Animação de entrada nos cards
+  // Adiciona eventos para os botões de ajuda
+  document.querySelectorAll('.btn-ajudar').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const produtoId = btn.dataset.produto;
+      const mercadoId = btn.dataset.mercado;
+      const mercadoNome = btn.dataset.mercadoNome;
+      abrirModalEnvioPreco(produtoId, mercadoId, mercadoNome);
+    });
+  });
+
+  // Animação de entrada
   requestAnimationFrame(() => {
     document.querySelectorAll('.card-mercado').forEach((card, i) => {
       card.style.animationDelay = `${i * 60}ms`;
@@ -212,27 +251,102 @@ function renderizarResultados(produto, dados) {
   });
 }
 
-// ─── Estados de UI ────────────────────────────────────────────
+// ─── Modal para envio de preço (colaboração) ─────────────────
+
+/**
+ * Abre um modal simples (ou usa prompt) para o usuário informar o preço e a foto.
+ * Utiliza as funções do integracao.js (uploadImageToHost, salvarPreco, etc.)
+ */
+async function abrirModalEnvioPreco(produtoId, mercadoId, mercadoNome) {
+  // Verifica se o usuário está logado (opcional)
+  const sess = obterSessao(); // função do integracao.js
+  if (!sess) {
+    if (confirm('Você não está logado. Deseja fazer login para colaborar?')) {
+      window.location.href = 'marido_aluguel.html'; // ou página de login
+    } else {
+      // Permite envio anônimo? Vamos permitir, mas registrar como anônimo.
+    }
+  }
+
+  const precoStr = prompt(`Informe o preço do ${produtoId.replace(/_/g,' ')} no ${mercadoNome} (ex: 4,99):`);
+  if (!precoStr) return;
+  const precoNum = parseFloat(precoStr.replace(',', '.'));
+  if (isNaN(precoNum)) {
+    alert('Preço inválido.');
+    return;
+  }
+
+  // Solicitar foto da etiqueta
+  const inputFoto = document.createElement('input');
+  inputFoto.type = 'file';
+  inputFoto.accept = 'image/*';
+  inputFoto.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Imagem muito grande. Máximo 5MB.');
+      return;
+    }
+    mostrarLoading('Enviando foto...');
+    try {
+      // Usa a função do integracao.js para fazer upload para ImgBB
+      const imageUrl = await uploadImageToHost(file, 800, 0.7);
+      // Prepara dados para salvar no backend
+      const dadosEnvio = {
+        produtoId,
+        mercadoId,
+        preco: precoNum,
+        fotoUrl: imageUrl,
+        usuarioId: sess?.usuarioId || 'anonimo',
+        usuarioNome: sess?.email || 'Anônimo'
+      };
+      const resultado = await salvarPreco(dadosEnvio);
+      if (resultado && resultado.ok) {
+        alert(`Preço enviado com sucesso! Obrigado pela colaboração.`);
+        // Recarrega os preços do produto atual
+        if (STATE.produtoAtual === produtoId) {
+          await buscarPrecos(produtoId);
+        }
+      } else {
+        throw new Error(resultado?.erro || 'Erro desconhecido');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao enviar preço: ' + err.message);
+    } finally {
+      // Fecha loading
+      document.getElementById('resultados').innerHTML = ''; // limpa mensagem de loading
+      await buscarPrecos(produtoId); // recarrega
+    }
+  };
+  inputFoto.click();
+}
+
+// ─── Estados de UI (mantidos) ────────────────────────────────
 
 function mostrarLoading(msg = 'Carregando…') {
-  document.getElementById('resultados').innerHTML = `
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>${msg}</p>
-    </div>`;
+  const container = document.getElementById('resultados');
+  if (container) {
+    container.innerHTML = `
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>${msg}</p>
+      </div>`;
+  }
 }
 
 function mostrarErro(msg, err) {
   console.error(err);
-  document.getElementById('resultados').innerHTML = `
-    <div class="estado-erro">
-      <span class="icone-erro">⚠️</span>
-      <p>${msg}</p>
-      <p class="detalhe-erro">${err?.message || ''}</p>
-    </div>`;
+  const container = document.getElementById('resultados');
+  if (container) {
+    container.innerHTML = `
+      <div class="estado-erro">
+        <span class="icone-erro">⚠️</span>
+        <p>${msg}</p>
+        <p class="detalhe-erro">${err?.message || ''}</p>
+      </div>`;
+  }
 }
-
-// ─── Formatação ───────────────────────────────────────────────
 
 function formatarData(isoString) {
   try {
