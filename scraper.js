@@ -37,7 +37,7 @@ async function main() {
   for (const mercado of mercadosAtivos) {
     console.log(`🏬 Processando ${mercado.nome}...`);
 
-    for (const produto of produtos.slice(0, 5)) { // ⚠️ Apenas 5 produtos para teste rápido; remova o slice depois
+    for (const produto of produtos) {// ⚠️ Apenas 5 produtos para teste rápido; remova o slice depois
       const termo = produto.palavras_chave[0];
       const urlBusca = `${mercado.base_url}${mercado.busca_url_template.replace('{TERMO}', encodeURIComponent(termo))}`;
 
