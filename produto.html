@@ -88,7 +88,32 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .ultima-atualizacao { text-align: center; margin-top: 30px; font-size: 0.8rem; }
 
-    /* MODAL DE ENVIO DE PREÇO (igual ao index) */
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      background: #155724;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.toast-error { background: #721c24; }
+    #toast.toast-info { background: #17a2b8; }
+
+    /* MODAL DE ENVIO DE PREÇO */
     .modal-preco {
       display: none;
       position: fixed;
@@ -107,7 +132,7 @@
       padding: 28px;
       position: relative;
     }
-    .modal-preco-content h3 { margin-bottom: 20px; color: var(--verde); }
+    .modal-preco-content h3 { margin-bottom: 20px; color: var(--verde); text-align: center; }
     .modal-preco-content input, .modal-preco-content button, .modal-preco-content select {
       width: 100%;
       padding: 14px;
@@ -132,9 +157,12 @@
       cursor: pointer;
       color: var(--texto-medio);
     }
+    .small-text { font-size: 0.7rem; color: var(--texto-medio); text-align: center; margin-top: 12px; }
   </style>
 </head>
 <body>
+
+<div id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
 
 <header class="top-bar">
   <div class="top-bar-inner">
@@ -151,29 +179,56 @@
   </div>
 </main>
 
-<!-- MODAL DE ENVIO DE PREÇO (reutilizado do index) -->
+<!-- MODAL DE ENVIO DE PREÇO -->
 <div id="modalEnvioPreco" class="modal-preco">
   <div class="modal-preco-content">
     <span class="close-modal" id="fecharModalPreco">&times;</span>
     <h3><i class="fas fa-camera"></i> Ajudar com preço</h3>
     <p id="infoProdutoMercado"></p>
     <input type="number" id="precoInput" step="0.01" placeholder="Preço (ex: 4,99)" required>
-    <label style="display:block; margin:8px 0 4px;">📸 Foto da etiqueta (obrigatória):</label>
+    <label>📸 Foto da etiqueta (obrigatória):</label>
     <input type="file" id="fotoInput" accept="image/*" capture="environment">
     <img id="fotoPreview" class="foto-preview" alt="Prévia da foto">
     <button id="btnEnviarPreco">Enviar preço e ajudar</button>
-    <p class="small-text" style="margin-top:12px; font-size:0.7rem;">A foto ajuda a validar o preço. Só serão aceitos envios entre 8h e 16h.</p>
+    <p class="small-text">A foto ajuda a validar o preço. Obrigado por colaborar!</p>
   </div>
 </div>
 
 <script>
   // ========== CONFIGURAÇÃO ==========
-  const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzOc79mQE9BP2h1LH6wzpkIpwPoVBSlqIlpYPUKhDzl1BVU6JUJiG4PvdYfmYXYyq3V/exec';
-  const IMGBB_API_KEY = '2597fbdd4014975ed01d56ee9a6b404d'; // mesma chave
+  const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJNABfam_giz6aSyWZ3Cd-iKjkLAXQEE-mMZvBiWS-t21R88SGNYTr4RnJApcdEDwEIA/exec';
+  const IMGBB_API_KEY = '2597fbdd4014975ed01d56ee9a6b404d';
 
-  let modoAtual = 'essencial';
-  let produtoAtual = null;
-  let precosCompletos = null;
+  // ========== TOAST ==========
+  function toast(msg, tipo = 'success') {
+    const el = document.getElementById('toast');
+    if (!el) { alert(msg); return; }
+    const txt = document.getElementById('toastMsg');
+    txt.textContent = msg;
+    el.className = `show ${tipo === 'error' ? 'toast-error' : tipo === 'info' ? 'toast-info' : ''}`;
+    const icon = el.querySelector('i');
+    if (icon) icon.className = tipo === 'error' ? 'fas fa-exclamation-circle' : tipo === 'info' ? 'fas fa-info-circle' : 'fas fa-check-circle';
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.className = ''; }, 4000);
+  }
+
+  // ========== HORÁRIO ==========
+  function getProximaJanela() {
+    const agora = new Date();
+    const horaBrasilia = (agora.getUTCHours() - 3 + 24) % 24;
+    if (horaBrasilia < 8) {
+      const hoje = new Date(agora);
+      hoje.setUTCHours(11, 0, 0, 0);
+      return { podeAgora: false, texto: `a partir das 8h de hoje`, timestamp: hoje.getTime() };
+    } else if (horaBrasilia < 16) {
+      return { podeAgora: true, texto: `até as 16h de hoje` };
+    } else {
+      const amanha = new Date(agora);
+      amanha.setUTCDate(agora.getUTCDate() + 1);
+      amanha.setUTCHours(11, 0, 0, 0);
+      return { podeAgora: false, texto: `a partir das 8h de amanhã`, timestamp: amanha.getTime() };
+    }
+  }
 
   // ========== FUNÇÕES DE COMUNICAÇÃO ==========
   async function fetchGET(action, params = {}) {
@@ -202,7 +257,7 @@
 
   async function salvarPreco(dados) { return await fetchPOST('enviar_preco', dados); }
 
-  // ========== UPLOAD DE IMAGEM (IMG.BB) ==========
+  // ========== UPLOAD DE IMAGEM ==========
   function compressImage(base64, maxWidth = 800, quality = 0.7, callback) {
     const img = new Image();
     img.onload = () => {
@@ -242,6 +297,7 @@
   }
 
   // ========== GERENCIAMENTO DE MODO ==========
+  let modoAtual = 'essencial';
   function carregarModo() {
     const salvo = localStorage.getItem('precojusto_modo');
     if (salvo && ['essencial', 'equilibrado', 'completo'].includes(salvo)) modoAtual = salvo;
@@ -252,7 +308,7 @@
     document.body.classList.remove('modo-essencial', 'modo-equilibrado', 'modo-completo');
     document.body.classList.add(`modo-${modoAtual}`);
     localStorage.setItem('precojusto_modo', modoAtual);
-    if (produtoAtual && precosCompletos) renderizarDetalhes(produtoAtual, precosCompletos);
+    if (window.produtoAtual && window.precosCompletos) renderizarDetalhes(window.produtoAtual, window.precosCompletos);
   }
   function mudarModo() {
     let novo = 'essencial';
@@ -265,6 +321,9 @@
   document.getElementById('mudarModoBtn').addEventListener('click', mudarModo);
 
   // ========== CARREGAR DETALHES ==========
+  let produtoAtual = null;
+  let precosCompletos = null;
+
   async function carregarDetalhes() {
     const params = new URLSearchParams(window.location.search);
     const produtoId = params.get('id');
@@ -277,9 +336,10 @@
         nome_canonico: dadosCompletos.produto_nome,
         categoria: dadosCompletos.produto_categoria,
         embalagem: dadosCompletos.produto_embalagem,
-        unidade_medida: 'kg' // ou extrair do produto, mas o endpoint não retorna; usaremos padrão
+        unidade_medida: 'kg'
       };
-      precosCompletos = dadosCompletos;
+      window.produtoAtual = produtoAtual;
+      window.precosCompletos = dadosCompletos;
       renderizarDetalhes(produtoAtual, dadosCompletos);
     } catch (error) {
       document.getElementById('produtoContainer').innerHTML = `<div style="text-align:center; padding:60px;">Erro: ${error.message}<br><a href="index.html">Voltar</a></div>`;
@@ -354,7 +414,7 @@
     html += `<div class="ultima-atualizacao">🕒 Última atualização: ${dataConsulta}</div>`;
     document.getElementById('produtoContainer').innerHTML = html;
 
-    // Adiciona eventos aos botões de ajuda
+    // Eventos dos botões de ajuda
     document.querySelectorAll('.btn-ajudar').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const produto = JSON.parse(btn.dataset.produto);
@@ -370,7 +430,7 @@
     }
   }
 
-  // ========== MODAL DE ENVIO DE PREÇO ==========
+  // ========== MODAL DE ENVIO ==========
   let produtoModal = null;
   let mercadoModal = null;
 
@@ -381,7 +441,6 @@
     const info = document.getElementById('infoProdutoMercado');
     if (mercado.mercado_id) {
       info.innerHTML = `<strong>${produto.nome_canonico}</strong><br>Mercado: ${mercado.mercado_nome}`;
-      // Cria um campo hidden ou apenas exibe o mercado fixo
       if (!document.getElementById('mercadoIdFixed')) {
         const inputHidden = document.createElement('input');
         inputHidden.type = 'hidden';
@@ -392,11 +451,9 @@
         document.getElementById('mercadoIdFixed').value = mercado.mercado_id;
       }
     } else {
-      // Para "ajudar primeiro", precisa selecionar o mercado
       info.innerHTML = `<strong>${produto.nome_canonico}</strong><br>Escolha o mercado:`;
-      let selectHtml = `<select id="selectMercadoEnvio" style="width:100%; padding:12px; margin:8px 0; border-radius:60px;">`;
-      // Buscar lista de mercados do backend (poderia ser passada, mas faremos fetch)
       fetchGET('mercados').then(mercados => {
+        let selectHtml = `<select id="selectMercadoEnvio" style="width:100%; padding:12px; margin:8px 0; border-radius:60px;">`;
         mercados.filter(m => m.ativo).forEach(m => selectHtml += `<option value="${m.id}">${m.logo} ${m.nome}</option>`);
         selectHtml += `</select>`;
         info.innerHTML += selectHtml;
@@ -408,7 +465,11 @@
     document.getElementById('fotoPreview').style.display = 'none';
   }
 
-  document.getElementById('fecharModalPreco').onclick = () => document.getElementById('modalEnvioPreco').style.display = 'none';
+  document.getElementById('fecharModalPreco').onclick = () => {
+    document.getElementById('modalEnvioPreco').style.display = 'none';
+    document.getElementById('fotoPreview').style.display = 'none';
+    document.getElementById('fotoInput').value = '';
+  };
   document.getElementById('fotoInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -419,20 +480,22 @@
         preview.style.display = 'block';
       };
       reader.readAsDataURL(file);
+    } else {
+      document.getElementById('fotoPreview').style.display = 'none';
     }
   });
 
   document.getElementById('btnEnviarPreco').onclick = async () => {
     const preco = parseFloat(document.getElementById('precoInput').value.replace(',', '.'));
-    if (isNaN(preco) || preco <= 0) { alert('Informe um preço válido.'); return; }
+    if (isNaN(preco) || preco <= 0) { toast('Informe um preço válido.', 'error'); return; }
     let mercadoId = mercadoModal?.mercado_id;
     if (!mercadoId) {
       const select = document.getElementById('selectMercadoEnvio');
       if (select) mercadoId = select.value;
-      else { alert('Selecione um mercado.'); return; }
+      else { toast('Selecione um mercado.', 'error'); return; }
     }
     const fotoFile = document.getElementById('fotoInput').files[0];
-    if (!fotoFile) { alert('Tire uma foto da etiqueta do preço.'); return; }
+    if (!fotoFile) { toast('Tire uma foto da etiqueta do preço.', 'error'); return; }
 
     let usuarioNome = localStorage.getItem('precojusto_nome');
     if (!usuarioNome) {
@@ -453,14 +516,22 @@
       };
       const resultado = await salvarPreco(dadosEnvio);
       if (resultado.ok) {
-        alert('Preço enviado com sucesso! Obrigado por ajudar a comunidade.');
+        const janela = getProximaJanela();
+        let msg = `✅ Preço enviado! Obrigado por ajudar a comunidade.`;
+        if (janela.podeAgora) msg += ` Você pode editar este preço ${janela.texto}.`;
+        else msg += ` Próxima atualização permitida ${janela.texto}.`;
+        toast(msg, 'success');
         document.getElementById('modalEnvioPreco').style.display = 'none';
-        // Recarrega os detalhes do produto
-        carregarDetalhes();
+        carregarDetalhes(); // recarrega
       } else throw new Error(resultado.erro);
     } catch (err) {
       console.error(err);
-      alert('Erro ao enviar: ' + err.message);
+      if (err.message.includes('horário') || err.message.includes('8h') || err.message.includes('16h')) {
+        const janela = getProximaJanela();
+        toast(`⚠️ ${err.message} Próxima atualização permitida ${janela.texto}.`, 'error');
+      } else {
+        toast('Erro ao enviar: ' + err.message, 'error');
+      }
     }
   };
 
