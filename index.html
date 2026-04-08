@@ -4,53 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <meta name="theme-color" content="#00843D">
-  <meta name="description" content="Preço Justo - Compare preços de supermercados do Rio de Janeiro. Economize nas suas compras!">
-  <title>Preço Justo · Compare preços de supermercado</title>
+  <meta name="description" content="Preço Justo - Compare preços, cuide de quem ama, escolha sua profundidade.">
+  <title>Preço Justo · Economize nas compras do mês</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
   <style>
-    /* ========== ESTILOS (mantidos exatamente como fornecidos) ========== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     :root {
       --verde: #00843D;
       --verde-esc: #005C2B;
       --amarelo: #FFD100;
-      --vermelho: #E31E26;
       --cinza-bg: #F4F6FA;
       --cinza-card: #FFFFFF;
       --cinza-border: #E9EEF3;
       --texto-escuro: #1A2634;
       --texto-medio: #5A6E8A;
-      --sombra-card: 0 2px 12px rgba(0,0,0,0.06);
-      --sombra-hover: 0 8px 24px rgba(0,0,0,0.10);
-      --raio-card: 20px;
     }
-    
+
     body {
       font-family: 'Inter', sans-serif;
       background: var(--cinza-bg);
       color: var(--texto-escuro);
       line-height: 1.5;
+      transition: font-size 0.2s;
     }
-    
+
+    /* MODOS */
+    body.modo-essencial {
+      font-size: 18px;
+    }
+    body.modo-equilibrado {
+      font-size: 17px;
+    }
+    body.modo-completo {
+      font-size: 16px;
+    }
+
+    /* LAYOUT BASE */
     .container {
       max-width: 1400px;
       margin: 0 auto;
       padding: 20px 24px;
     }
-    
-    /* Header */
+
     .top-bar {
       background: var(--verde);
       padding: 16px 24px;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
-    
     .top-bar-inner {
       max-width: 1400px;
       margin: 0 auto;
@@ -60,529 +68,368 @@
       flex-wrap: wrap;
       gap: 16px;
     }
-    
-    .logo-area {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-    }
-    
     .logo {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 800;
       color: white;
-      letter-spacing: -0.5px;
     }
-    
     .logo span {
       color: var(--amarelo);
     }
-    
-    .tagline {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.8);
-      font-weight: 400;
-    }
-    
-    .search-box-header {
-      flex: 1;
-      max-width: 500px;
-      position: relative;
-    }
-    
-    .search-box-header i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--texto-medio);
-    }
-    
-    .search-box-header input {
-      width: 100%;
-      padding: 14px 16px 14px 48px;
-      border-radius: 50px;
-      border: 2px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.95);
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.2s;
-    }
-    
-    .search-box-header input:focus {
-      border-color: var(--amarelo);
-      background: white;
-      box-shadow: 0 0 0 4px rgba(255,209,0,0.2);
-    }
-    
-    .header-actions {
-      display: flex;
-      gap: 12px;
-    }
-    
-    .btn-header {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
+    .btn-mudar-modo {
+      background: rgba(255,255,255,0.2);
+      border: none;
       padding: 10px 20px;
-      border-radius: 50px;
+      border-radius: 40px;
+      color: white;
       font-weight: 600;
-      font-size: 0.9rem;
       cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      transition: 0.2s;
     }
-    
-    .btn-header:hover {
-      background: rgba(255,255,255,0.25);
-      border-color: var(--amarelo);
+    .btn-mudar-modo:hover {
+      background: rgba(255,255,255,0.35);
     }
-    
-    /* Faixa de Mercados */
+
     .mercados-strip {
       background: var(--verde-esc);
-      padding: 8px 24px;
-      border-bottom: 2px solid var(--amarelo);
+      padding: 10px 24px;
       overflow-x: auto;
       white-space: nowrap;
     }
-    
-    .mercados-strip-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    
-    .mercados-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
-    }
-    
-    .mercados-chips {
-      display: flex;
-      gap: 8px;
-    }
-    
     .mercado-chip {
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.9);
-      padding: 4px 14px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      padding: 6px 16px;
       border-radius: 30px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.15);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 0.85rem;
     }
-    
-    /* Categorias */
+
     .categorias-nav {
       background: white;
-      border-bottom: 1px solid var(--cinza-border);
       padding: 0 24px;
       overflow-x: auto;
+      border-bottom: 1px solid var(--cinza-border);
+      white-space: nowrap;
     }
-    
-    .categorias-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      gap: 4px;
-    }
-    
     .categoria-item {
-      padding: 16px 20px;
-      font-size: 0.9rem;
+      display: inline-block;
+      padding: 14px 20px;
       font-weight: 600;
       color: var(--texto-medio);
       cursor: pointer;
       border-bottom: 3px solid transparent;
-      transition: all 0.2s;
-      white-space: nowrap;
     }
-    
-    .categoria-item:hover {
-      color: var(--verde);
-      background: rgba(0,132,61,0.05);
-    }
-    
     .categoria-item.active {
       color: var(--verde);
       border-bottom-color: var(--verde);
     }
-    
-    /* Conteúdo Principal */
-    .main-content {
-      padding: 32px 24px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    
-    .section-header h2 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--texto-escuro);
-    }
-    
-    .section-header h2 i {
-      color: var(--verde);
-      margin-right: 10px;
-    }
-    
-    .btn-outline {
-      background: transparent;
-      border: 1.5px solid var(--cinza-border);
-      padding: 8px 20px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
+
+    /* CARD DE AFETO (comum) */
+    .card-afeto {
+      background: #fef9e3;
+      border-radius: 28px;
+      padding: 24px;
+      margin: 30px 0;
+      border-left: 8px solid var(--amarelo);
       transition: all 0.2s;
-      color: var(--texto-medio);
     }
-    
-    .btn-outline:hover {
-      border-color: var(--verde);
-      color: var(--verde);
-      background: rgba(0,132,61,0.05);
+    .card-afeto h3 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    
-    /* Grid de Produtos */
+    .pergunta-gratidao {
+      font-size: 1.2rem;
+      margin: 16px 0;
+    }
+    .btn-afeto {
+      background: var(--verde);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 60px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 12px;
+      margin-top: 8px;
+      transition: 0.2s;
+    }
+    .btn-respira {
+      background: #F59E0B;
+    }
+
+    /* PRODUTOS GRID (adaptado por modo) */
     .produtos-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 24px;
+      margin-top: 20px;
     }
-    
+    body.modo-essencial .produtos-grid {
+      grid-template-columns: 1fr;
+    }
+    body.modo-equilibrado .produtos-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    body.modo-completo .produtos-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
     .produto-card {
-      background: var(--cinza-card);
-      border-radius: var(--raio-card);
-      border: 1px solid var(--cinza-border);
-      overflow: hidden;
-      transition: all 0.25s;
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       cursor: pointer;
-      box-shadow: var(--sombra-card);
+      transition: 0.2s;
+      border: 1px solid var(--cinza-border);
     }
-    
     .produto-card:hover {
       transform: translateY(-4px);
-      box-shadow: var(--sombra-hover);
       border-color: var(--verde);
     }
-    
-    .card-content {
-      padding: 20px;
-    }
-    
     .card-categoria {
       display: inline-block;
       background: rgba(0,132,61,0.1);
       color: var(--verde);
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 700;
       padding: 4px 12px;
       border-radius: 30px;
       margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
-    
     .card-nome {
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       font-weight: 700;
-      margin-bottom: 4px;
-      line-height: 1.3;
+      margin-bottom: 6px;
     }
-    
     .card-embalagem {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: var(--texto-medio);
       margin-bottom: 16px;
     }
-    
-    .card-melhor-preco {
-      background: #F0FAF4;
-      border-radius: 16px;
-      padding: 14px;
-      margin-top: 12px;
-    }
-    
-    .melhor-preco-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--texto-medio);
-      margin-bottom: 4px;
-    }
-    
-    .melhor-preco-valor {
+    .preco-grande {
       font-size: 2rem;
       font-weight: 800;
       color: var(--verde-esc);
-      line-height: 1;
     }
-    
-    .melhor-preco-mercado {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 8px;
+    .preco-unidade {
       font-size: 0.8rem;
       color: var(--texto-medio);
+      margin: 4px 0;
     }
-    
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--cinza-border);
-    }
-    
-    .mercados-count {
-      font-size: 0.75rem;
-      color: var(--texto-medio);
-    }
-    
     .btn-card {
       background: var(--verde);
       color: white;
       border: none;
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-size: 0.8rem;
+      padding: 10px 20px;
+      border-radius: 40px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      width: 100%;
+      margin-top: 16px;
+      transition: 0.2s;
     }
-    
     .btn-card:hover {
       background: var(--verde-esc);
-      transform: scale(1.02);
     }
-    
-    /* Loading e Estados */
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 400px;
-      gap: 20px;
-    }
-    
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid var(--cinza-border);
-      border-top-color: var(--verde);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--texto-medio);
-    }
-    
-    .empty-state i {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      opacity: 0.4;
-    }
-    
-    /* Footer */
+
     .footer {
       text-align: center;
-      padding: 30px 20px;
+      padding: 30px;
       background: white;
-      border-top: 1px solid var(--cinza-border);
       margin-top: 40px;
+      font-size: 0.8rem;
     }
-    
-    .footer-links {
+    .loading-spinner {
+      border: 4px solid #e2e8f0;
+      border-top-color: var(--verde);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* MODAL DE ESCOLHA */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
       display: flex;
-      justify-content: center;
-      gap: 30px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-    
-    .footer-links a {
-      color: var(--texto-medio);
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: color 0.2s;
-      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
     }
-    
-    .footer-links a:hover {
-      color: var(--verde);
+    .modal-container {
+      background: white;
+      max-width: 600px;
+      width: 90%;
+      border-radius: 48px;
+      padding: 40px 32px;
+      text-align: center;
+      animation: fadeIn 0.3s;
     }
-    
-    .footer-copyright {
-      font-size: 0.75rem;
-      color: var(--texto-medio);
-      opacity: 0.7;
+    .modo-opcoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin: 32px 0;
     }
-    
-    .ultima-atualizacao {
-      font-size: 0.7rem;
-      color: var(--texto-medio);
-      margin-top: 10px;
+    .modo-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 16px 24px;
+      border-radius: 60px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      min-width: 140px;
     }
-    
-    /* Responsivo */
-    @media (max-width: 768px) {
-      .top-bar-inner {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .search-box-header {
-        max-width: 100%;
-      }
-      
-      .produtos-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .categoria-item {
-        padding: 12px 16px;
-        font-size: 0.8rem;
-      }
+    .modo-btn i {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .modo-btn:hover {
+      background: var(--verde);
+      color: white;
+      transform: scale(1.02);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
 
-<!-- Header -->
-<header class="top-bar">
-  <div class="top-bar-inner">
-    <div class="logo-area">
-      <div class="logo">Preço<span>Justo</span></div>
-      <div class="tagline">Economize nas compras do mês</div>
-    </div>
-    
-    <div class="search-box-header">
-      <i class="fas fa-search"></i>
-      <input type="text" id="searchInput" placeholder="Buscar arroz, feijão, leite...">
-    </div>
-    
-    <div class="header-actions">
-      <button class="btn-header" id="atualizarBtn">
-        <i class="fas fa-sync-alt"></i> Atualizar
+<!-- MODAL DE ESCOLHA INICIAL -->
+<div id="modalEscolha" class="modal-overlay">
+  <div class="modal-container">
+    <h2>🌀 Como você quer viver o Preço Justo?</h2>
+    <p>Escolha a profundidade da experiência. Você pode mudar depois.</p>
+    <div class="modo-opcoes">
+      <button class="modo-btn" data-modo="essencial">
+        <i class="fas fa-seedling"></i>
+        Essencial<br><small>Simples e leve</small>
+      </button>
+      <button class="modo-btn" data-modo="equilibrado">
+        <i class="fas fa-balance-scale"></i>
+        Equilibrado<br><small>Intermediário</small>
+      </button>
+      <button class="modo-btn" data-modo="completo">
+        <i class="fas fa-brain"></i>
+        Completo<br><small>Avançado</small>
       </button>
     </div>
-  </div>
-</header>
-
-<!-- Faixa de Mercados -->
-<div class="mercados-strip">
-  <div class="mercados-strip-inner">
-    <span class="mercados-label" id="mercadosCountLabel">Monitorando <span id="mercadosCount">0</span> mercados:</span>
-    <div class="mercados-chips" id="mercadosChips"></div>
+    <button id="btnLembrarEscolha" class="btn-afeto" style="background: #e2e8f0; color: #1e293b;">✅ Lembrar minha escolha</button>
   </div>
 </div>
 
-<!-- Categorias -->
-<nav class="categorias-nav">
-  <div class="categorias-inner" id="categoriasNav">
-    <div class="categoria-item active" data-categoria="todos">📦 Todos</div>
+<!-- HEADER -->
+<header class="top-bar">
+  <div class="top-bar-inner">
+    <div class="logo">Preço<span>Justo</span></div>
+    <button id="mudarModoBtn" class="btn-mudar-modo"><i class="fas fa-sliders-h"></i> Mudar modo</button>
   </div>
-</nav>
+</header>
 
-<!-- Conteúdo Principal -->
-<main class="main-content">
-  <div class="section-header">
-    <h2><i class="fas fa-tags"></i> Produtos em destaque</h2>
-    <button class="btn-outline" id="ordenarBtn">
-      <i class="fas fa-arrow-down-wide-short"></i> Menor preço
-    </button>
-  </div>
-  
-  <div id="produtosContainer">
-    <div class="loading-container">
-      <div class="loading-spinner"></div>
-      <p>Carregando produtos...</p>
-    </div>
-  </div>
-</main>
+<!-- MERCADOS -->
+<div class="mercados-strip" id="mercadosStrip"></div>
 
-<!-- Footer -->
+<!-- CATEGORIAS -->
+<nav class="categorias-nav" id="categoriasNav"></nav>
+
+<div class="container">
+  <!-- CARD DE AFETO (gratidão + respiração) -->
+  <div class="card-afeto">
+    <h3><i class="fas fa-heart" style="color:#E31E26;"></i> <span id="saudacao">Bom dia</span></h3>
+    <div class="pergunta-gratidao" id="perguntaGratidao">🌟 Pelo que você é grato(a) hoje?</div>
+    <button id="btnResponder" class="btn-afeto">Responder</button>
+    <button id="btnRespira" class="btn-afeto btn-respira"><i class="fas fa-lungs"></i> Respiração guiada</button>
+  </div>
+
+  <!-- LISTA DE PRODUTOS -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
+    <h2><i class="fas fa-tags"></i> Produtos</h2>
+    <button id="ordenarBtn" class="btn-afeto" style="background: white; color: var(--verde); border:1px solid var(--cinza-border);">Menor preço</button>
+  </div>
+  <div id="produtosContainer" style="min-height: 300px;">
+    <div class="loading-spinner"></div>
+    <p style="text-align:center; margin-top:16px;">Carregando produtos...</p>
+  </div>
+</div>
+
 <footer class="footer">
-  <div class="footer-links">
-    <a href="#"><i class="fas fa-file-alt"></i> Como funciona</a>
-    <a href="#"><i class="fas fa-store"></i> Mercados participantes</a>
-    <a href="mailto:contato@precojusto.com"><i class="fas fa-envelope"></i> Contato</a>
-  </div>
-  <div class="footer-copyright">
-    © 2026 Preço Justo · Preços atualizados automaticamente às 8h e 16h (dias úteis)<br>
-    <span class="ultima-atualizacao" id="ultimaAtualizacao"></span>
-  </div>
+  <p>© 2026 Preço Justo · O fluxo que respeita sua escolha.</p>
+  <p id="ultimaAtualizacao" style="margin-top:8px;"></p>
 </footer>
 
 <script>
-  // ========== CONFIGURAÇÃO ==========
+  // ========== CONFIGURAÇÃO GLOBAL ==========
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAvPEyw-3ziOOahKMzxrAD_LiiOAkryCbBZxb34Ga-4wH814uHgk8Lc-uowkUhT0N5Q/exec';
-  
   let todosProdutos = [];
   let todosMercados = [];
   let categoriaAtual = 'todos';
   let termoBusca = '';
   let ordenacao = 'menor_preco';
-  let carregandoPrecos = false;
+  let modoAtual = 'essencial';
 
-  // ========== INICIALIZAÇÃO ==========
-  async function inicializar() {
-    try {
-      const [produtos, mercados] = await Promise.all([
-        fetchGAS('produtos'),
-        fetchGAS('mercados')
-      ]);
-      
-      todosProdutos = produtos;
-      todosMercados = mercados.filter(m => m.ativo);
-      
-      renderizarMercadosChips();
-      renderizarCategorias();
-      await carregarPrecosProdutos();
-      renderizarProdutos();
-    } catch (error) {
-      console.error('Erro ao inicializar:', error);
-      document.getElementById('produtosContainer').innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Erro ao carregar produtos. Tente novamente.</p>
-        </div>
-      `;
+  // ========== GERENCIAMENTO DE MODO ==========
+  function carregarModo() {
+    const salvo = localStorage.getItem('precojusto_modo');
+    if (salvo && ['essencial', 'equilibrado', 'completo'].includes(salvo)) {
+      modoAtual = salvo;
+    } else {
+      modoAtual = 'essencial';
     }
+    aplicarModo();
   }
-  
+
+  function aplicarModo() {
+    const body = document.body;
+    body.classList.remove('modo-essencial', 'modo-equilibrado', 'modo-completo');
+    body.classList.add(`modo-${modoAtual}`);
+    localStorage.setItem('precojusto_modo', modoAtual);
+    if (todosProdutos.length) renderizarProdutos();
+  }
+
+  function abrirModalEscolha() {
+    const modal = document.getElementById('modalEscolha');
+    modal.style.display = 'flex';
+  }
+
+  function fecharModalEIniciar(modo) {
+    modoAtual = modo;
+    localStorage.setItem('precojusto_modo', modo);
+    aplicarModo();
+    document.getElementById('modalEscolha').style.display = 'none';
+    inicializar();
+  }
+
+  document.querySelectorAll('.modo-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const modoEscolhido = btn.getAttribute('data-modo');
+      fecharModalEIniciar(modoEscolhido);
+    });
+  });
+  document.getElementById('btnLembrarEscolha').addEventListener('click', () => {
+    alert('Escolha um dos modos acima para continuar.');
+  });
+  document.getElementById('mudarModoBtn').addEventListener('click', () => {
+    abrirModalEscolha();
+  });
+
+  // ========== INTEGRAÇÃO COM GAS ==========
   async function fetchGAS(action, params = {}) {
     const query = new URLSearchParams({ action, ...params }).toString();
     const url = `${GAS_URL}?${query}`;
@@ -592,188 +439,174 @@
     if (json.erro) throw new Error(json.erro);
     return json;
   }
-  
-  // ========== CARREGAR PREÇOS (com feedback visual aprimorado) ==========
-  async function carregarPrecosProdutos() {
-    if (carregandoPrecos) return;
-    carregandoPrecos = true;
-    
+
+  async function inicializar() {
+    try {
+      const [produtos, mercados] = await Promise.all([
+        fetchGAS('produtos'),
+        fetchGAS('mercados')
+      ]);
+      todosProdutos = produtos;
+      todosMercados = mercados.filter(m => m.ativo);
+      renderizarMercados();
+      renderizarCategorias();
+      await carregarPrecos();
+      renderizarProdutos();
+      configurarAfeto();
+    } catch (err) {
+      console.error(err);
+      document.getElementById('produtosContainer').innerHTML = '<div style="text-align:center; padding:60px;">⚠️ Erro ao carregar. Tente recarregar.</div>';
+    }
+  }
+
+  async function carregarPrecos() {
     const container = document.getElementById('produtosContainer');
-    const produtosParaBuscar = todosProdutos.slice(0, 30); // Limite para performance
-    
-    container.innerHTML = `
-      <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <p>Atualizando preços em ${todosMercados.length} mercados...</p>
-        <p style="font-size:0.8rem; margin-top:8px;">0 / ${produtosParaBuscar.length} produtos</p>
-      </div>
-    `;
-    
-    let concluidos = 0;
-    const progressText = container.querySelector('p:last-child');
-    
-    for (const produto of produtosParaBuscar) {
+    container.innerHTML = `<div class="loading-spinner"></div><p style="text-align:center;">Atualizando preços...</p>`;
+    for (const produto of todosProdutos) {
       try {
         const dados = await fetchGAS('precos', { produto: produto.id });
         produto.melhorPreco = dados.resultados?.[0] || null;
         produto.totalMercados = dados.total_mercados || 0;
         produto.ultimaAtualizacao = dados.consultado_em;
-      } catch (error) {
+      } catch(e) {
         produto.melhorPreco = null;
         produto.totalMercados = 0;
       }
-      
-      concluidos++;
-      if (progressText) {
-        progressText.textContent = `${concluidos} / ${produtosParaBuscar.length} produtos`;
-      }
     }
-    
-    if (produtosParaBuscar[0]?.ultimaAtualizacao) {
-      document.getElementById('ultimaAtualizacao').textContent = 
-        `Última atualização: ${new Date(produtosParaBuscar[0].ultimaAtualizacao).toLocaleString('pt-BR')}`;
+    if (todosProdutos[0]?.ultimaAtualizacao) {
+      document.getElementById('ultimaAtualizacao').innerHTML = `Última atualização: ${new Date(todosProdutos[0].ultimaAtualizacao).toLocaleString('pt-BR')}`;
     }
-    
-    carregandoPrecos = false;
   }
-  
-  // ========== RENDERIZAÇÃO ==========
-  function renderizarMercadosChips() {
-    const container = document.getElementById('mercadosChips');
-    const countSpan = document.getElementById('mercadosCount');
-    
-    // Exibe TODOS os mercados ativos (já inclui Atacadão e exclui Armazém Urbano)
-    container.innerHTML = todosMercados.map(m => `
-      <span class="mercado-chip" style="border-left: 3px solid ${m.cor || '#00843D'}">
-        ${m.logo || '🛒'} ${m.nome}
-      </span>
-    `).join('');
-    
-    countSpan.textContent = todosMercados.length;
+
+  function renderizarMercados() {
+    const strip = document.getElementById('mercadosStrip');
+    strip.innerHTML = `<div style="display:flex; gap:8px; flex-wrap:wrap;">${todosMercados.map(m => `<span class="mercado-chip">${m.logo || '🛒'} ${m.nome}</span>`).join('')}</div>`;
   }
-  
+
   function renderizarCategorias() {
-    const categorias = ['todos', ...new Set(todosProdutos.map(p => p.categoria))];
+    const cats = ['todos', ...new Set(todosProdutos.map(p => p.categoria))];
     const nav = document.getElementById('categoriasNav');
-    
-    nav.innerHTML = categorias.map(cat => `
-      <div class="categoria-item ${cat === 'todos' ? 'active' : ''}" data-categoria="${cat}">
-        ${cat === 'todos' ? '📦 Todos' : cat}
-      </div>
-    `).join('');
-    
+    nav.innerHTML = cats.map(c => `<span class="categoria-item ${c === categoriaAtual ? 'active' : ''}" data-cat="${c}">${c === 'todos' ? '📦 Todos' : c}</span>`).join('');
     document.querySelectorAll('.categoria-item').forEach(el => {
       el.addEventListener('click', () => {
-        document.querySelectorAll('.categoria-item').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        categoriaAtual = el.dataset.categoria;
+        categoriaAtual = el.getAttribute('data-cat');
+        renderizarCategorias();
         renderizarProdutos();
       });
     });
   }
-  
+
   function renderizarProdutos() {
-    let produtosFiltrados = todosProdutos.filter(p => {
+    let filtrados = todosProdutos.filter(p => {
       if (categoriaAtual !== 'todos' && p.categoria !== categoriaAtual) return false;
       if (termoBusca && !p.nome_canonico.toLowerCase().includes(termoBusca.toLowerCase())) return false;
       return true;
     });
-    
-    // Ordenação
-    produtosFiltrados.sort((a, b) => {
-      const precoA = a.melhorPreco?.resultados?.[0]?.preco_por_unidade || 999999;
-      const precoB = b.melhorPreco?.resultados?.[0]?.preco_por_unidade || 999999;
-      
-      if (ordenacao === 'menor_preco') return precoA - precoB;
-      if (ordenacao === 'maior_preco') return precoB - precoA;
-      return 0;
+    filtrados.sort((a,b) => {
+      const pa = a.melhorPreco?.resultados?.[0]?.preco || 999999;
+      const pb = b.melhorPreco?.resultados?.[0]?.preco || 999999;
+      return ordenacao === 'menor_preco' ? pa - pb : pb - pa;
     });
-    
     const container = document.getElementById('produtosContainer');
-    
-    if (produtosFiltrados.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-search"></i>
-          <p>Nenhum produto encontrado.</p>
-        </div>
-      `;
+    if (filtrados.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:60px;">Nenhum produto encontrado.</div>`;
       return;
     }
-    
-    container.innerHTML = `
-      <div class="produtos-grid">
-        ${produtosFiltrados.slice(0, 30).map(produto => {
-          const melhor = produto.melhorPreco;
-          const temPreco = melhor && melhor.resultados && melhor.resultados.length > 0;
-          const precoData = temPreco ? melhor.resultados[0] : null;
-          
-          return `
-            <div class="produto-card" onclick="window.location.href='produto.html?id=${produto.id}'">
-              <div class="card-content">
-                <span class="card-categoria">${produto.categoria}</span>
-                <h3 class="card-nome">${produto.nome_canonico}</h3>
-                <p class="card-embalagem">${produto.embalagem}</p>
-                
-                <div class="card-melhor-preco">
-                  <div class="melhor-preco-label">
-                    ${temPreco ? '🏆 Melhor preço' : '⏳ Aguardando preços'}
-                  </div>
-                  ${temPreco ? `
-                    <div class="melhor-preco-valor">
-                      R$ ${precoData.preco.toFixed(2).replace('.', ',')}
-                    </div>
-                    <div style="font-size:0.75rem; color: var(--texto-medio); margin-top: 4px;">
-                      R$ ${precoData.preco_por_unidade?.toFixed(2).replace('.', ',')}/${produto.unidade_medida || 'kg'}
-                    </div>
-                    <div class="melhor-preco-mercado">
-                      <span>${melhor.mercado_logo || '🛒'}</span>
-                      <span>${melhor.mercado_nome}</span>
-                    </div>
-                  ` : `
-                    <div class="melhor-preco-valor" style="font-size:1.2rem; color: var(--texto-medio);">
-                      --
-                    </div>
-                  `}
-                </div>
-                
-                <div class="card-footer">
-                  <span class="mercados-count">
-                    <i class="fas fa-store"></i> ${produto.totalMercados || 0} mercados
-                  </span>
-                  <button class="btn-card" onclick="event.stopPropagation(); window.location.href='produto.html?id=${produto.id}'">
-                    Comparar <i class="fas fa-arrow-right"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
+    const isEssencial = modoAtual === 'essencial';
+    const isCompleto = modoAtual === 'completo';
+    const limite = isEssencial ? 15 : 30;
+    const html = `<div class="produtos-grid">${filtrados.slice(0, limite).map(produto => {
+      const melhor = produto.melhorPreco;
+      const temPreco = melhor && melhor.resultados?.length > 0;
+      const precoData = temPreco ? melhor.resultados[0] : null;
+      const precoStr = temPreco ? `R$ ${precoData.preco.toFixed(2).replace('.',',')}` : '--';
+      const mercadoNome = temPreco ? melhor.mercado_nome : 'Aguardando';
+      const precoUnidadeStr = temPreco && precoData.preco_por_unidade ? `R$ ${precoData.preco_por_unidade.toFixed(2).replace('.',',')}/${produto.unidade_medida || 'kg'}` : '';
+      
+      if (isEssencial) {
+        return `
+          <div class="produto-card" onclick="window.location.href='produto.html?id=${produto.id}'">
+            <div class="card-categoria">${produto.categoria}</div>
+            <div class="card-nome">${produto.nome_canonico}</div>
+            <div class="card-embalagem">${produto.embalagem}</div>
+            <div class="preco-grande">${precoStr}</div>
+            <div style="margin: 8px 0;"><i class="fas fa-store"></i> ${mercadoNome}</div>
+            <button class="btn-card" onclick="event.stopPropagation(); location.href='produto.html?id=${produto.id}'">Ver detalhes</button>
+          </div>
+        `;
+      }
+      return `
+        <div class="produto-card" onclick="window.location.href='produto.html?id=${produto.id}'">
+          <div class="card-categoria">${produto.categoria}</div>
+          <div class="card-nome">${produto.nome_canonico}</div>
+          <div class="card-embalagem">${produto.embalagem}</div>
+          <div class="preco-grande">${precoStr}</div>
+          ${isCompleto && precoUnidadeStr ? `<div class="preco-unidade">${precoUnidadeStr}</div>` : ''}
+          <div style="margin: 8px 0;"><i class="fas fa-store"></i> ${mercadoNome}</div>
+          <button class="btn-card" onclick="event.stopPropagation(); location.href='produto.html?id=${produto.id}'">Comparar</button>
+        </div>
+      `;
+    }).join('')}</div>`;
+    container.innerHTML = html;
   }
-  
-  // ========== EVENT LISTENERS ==========
-  document.getElementById('searchInput').addEventListener('input', (e) => {
+
+  // ========== FUNÇÕES DE AFETO ==========
+  function configurarAfeto() {
+    const saudacaoSpan = document.getElementById('saudacao');
+    const hora = new Date().getHours();
+    if (hora < 12) saudacaoSpan.innerText = 'Bom dia 🌞';
+    else if (hora < 18) saudacaoSpan.innerText = 'Boa tarde 🌤️';
+    else saudacaoSpan.innerText = 'Boa noite 🌙';
+
+    const savedGratidao = localStorage.getItem('precojusto_gratidao');
+    if (savedGratidao) {
+      document.getElementById('perguntaGratidao').innerHTML = `🌸 Hoje você agradece: "${savedGratidao.substring(0, 80)}"`;
+    }
+
+    document.getElementById('btnResponder').addEventListener('click', () => {
+      const resposta = prompt('🌻 Escreva o que te faz sentir gratidão hoje:');
+      if (resposta && resposta.trim()) {
+        localStorage.setItem('precojusto_gratidao', resposta);
+        document.getElementById('perguntaGratidao').innerHTML = `🌸 Hoje você agradece: "${resposta.substring(0, 80)}"`;
+      }
+    });
+
+    document.getElementById('btnRespira').addEventListener('click', () => {
+      const msg = document.createElement('div');
+      msg.textContent = '🌀 Pausa de 0,18 segundos...';
+      msg.style.position = 'fixed'; msg.style.bottom = '20px'; msg.style.left = '20px';
+      msg.style.background = '#00843D'; msg.style.color = 'white'; msg.style.padding = '12px 24px';
+      msg.style.borderRadius = '40px'; msg.style.zIndex = '999';
+      document.body.appendChild(msg);
+      setTimeout(() => {
+        msg.remove();
+        alert('🧘 Inspire por 4 segundos, segure por 7, expire por 8. Repita 3 vezes. Acalma a mente e o coração.');
+      }, 180);
+    });
+  }
+
+  // ========== ORDENAÇÃO E BUSCA ==========
+  document.getElementById('ordenarBtn').addEventListener('click', () => {
+    ordenacao = ordenacao === 'menor_preco' ? 'maior_preco' : 'menor_preco';
+    document.getElementById('ordenarBtn').innerHTML = ordenacao === 'menor_preco' ? 'Menor preço' : 'Maior preço';
+    renderizarProdutos();
+  });
+
+  const searchDiv = document.createElement('div');
+  searchDiv.style.cssText = 'flex:1; max-width:400px;';
+  searchDiv.innerHTML = `<input type="text" id="searchProduto" placeholder="🔍 Buscar produto..." style="width:100%; padding:12px 20px; border-radius:40px; border:none;">`;
+  document.querySelector('.top-bar-inner').appendChild(searchDiv);
+  document.getElementById('searchProduto').addEventListener('input', (e) => {
     termoBusca = e.target.value;
     renderizarProdutos();
   });
-  
-  document.getElementById('atualizarBtn').addEventListener('click', async () => {
-    await carregarPrecosProdutos();
-    renderizarProdutos();
-  });
-  
-  document.getElementById('ordenarBtn').addEventListener('click', () => {
-    ordenacao = ordenacao === 'menor_preco' ? 'maior_preco' : 'menor_preco';
-    document.getElementById('ordenarBtn').innerHTML = ordenacao === 'menor_preco' 
-      ? '<i class="fas fa-arrow-down-wide-short"></i> Menor preço'
-      : '<i class="fas fa-arrow-up-wide-short"></i> Maior preço';
-    renderizarProdutos();
-  });
-  
-  // Iniciar
-  inicializar();
+
+  if (!localStorage.getItem('precojusto_modo')) {
+    abrirModalEscolha();
+  } else {
+    carregarModo();
+    inicializar();
+  }
 </script>
 </body>
 </html>
