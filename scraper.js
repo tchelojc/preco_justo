@@ -44,9 +44,10 @@ function bateProduto(nomeSite, palavrasChave) {
 async function main() {
   console.log('🚀 Iniciando scraper por categorias...\n');
 
+  const categoriasMercados = JSON.parse(fs.readFileSync(path.join(DIR_DADOS, 'categorias_mercados.json'), 'utf8'));
   const mercados = JSON.parse(fs.readFileSync(path.join(DIR_DADOS, 'mercados_rj.json'), 'utf8'));
   const produtos = JSON.parse(fs.readFileSync(path.join(DIR_DADOS, 'produtos_base.json'), 'utf8'));
-  const ativos = mercados.filter(m => m.ativo && m.tipo === 'pagina_categoria');
+  const ativos = mercados.filter(m => m.ativo && categoriasMercados[m.id]);
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -58,14 +59,16 @@ async function main() {
 
   for (const mercado of ativos) {
     console.log(`\n🏬 ${mercado.nome}`);
+    const config = categoriasMercados[mercado.id];
     const page = await context.newPage();
 
+    // Objeto para acumular resultados de todas as categorias deste mercado
     const resultadosPorProduto = {};
     for (const produto of produtos) {
       resultadosPorProduto[produto.id] = [];
     }
 
-    for (const categoria of mercado.categorias) {
+    for (const categoria of config.categorias) {
       console.log(`   📂 Categoria: ${categoria.nome}`);
       try {
         await page.goto(categoria.url, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -104,6 +107,7 @@ async function main() {
       await page.waitForTimeout(2000);
     }
 
+    // Salva os arquivos de cache para este mercado
     for (const produto of produtos) {
       const resultados = resultadosPorProduto[produto.id] || [];
       const cacheFile = path.join(DIR_CACHE, `${mercado.id}_${produto.id}.json`);
@@ -126,6 +130,7 @@ async function main() {
 
   await browser.close();
 
+  // Índice
   fs.writeFileSync(path.join(DIR_CACHE, '_indice.json'), JSON.stringify({
     atualizado_em: new Date().toISOString(),
     mercados: ativos.map(m => m.id),
