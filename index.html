@@ -36,6 +36,7 @@
 
     .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
 
+    /* Header */
     .top-bar {
       background: var(--verde);
       padding: 16px 24px;
@@ -66,6 +67,7 @@
     }
     .btn-mudar-modo:hover { background: rgba(255,255,255,0.35); }
 
+    /* Banner propósito */
     .banner-proposito {
       background: linear-gradient(135deg, #e6f7ec, #d0ebd9);
       border-radius: 28px;
@@ -73,13 +75,8 @@
       margin: 20px 0;
       border-left: 8px solid var(--verde);
     }
-    .banner-proposito p {
-      font-size: 1rem;
-      margin: 8px 0;
-    }
-    .banner-proposito strong {
-      color: var(--verde-esc);
-    }
+    .banner-proposito p { font-size: 1rem; margin: 8px 0; }
+    .banner-proposito strong { color: var(--verde-esc); }
     .stats-badge {
       background: white;
       border-radius: 40px;
@@ -91,65 +88,36 @@
       margin-top: 8px;
     }
 
-    .mercados-strip {
-      background: var(--verde-esc);
-      padding: 10px 24px;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    .mercado-chip {
-      background: rgba(255,255,255,0.15);
-      color: white;
-      padding: 6px 16px;
-      border-radius: 30px;
-      display: inline-block;
-      margin-right: 8px;
-      font-size: 0.85rem;
-    }
-
-    .categorias-nav {
+    /* Abas de mercados */
+    .mercados-abas {
       background: white;
-      padding: 0 24px;
+      padding: 12px 24px;
       overflow-x: auto;
-      border-bottom: 1px solid var(--cinza-border);
       white-space: nowrap;
+      border-bottom: 1px solid var(--cinza-border);
+      margin-bottom: 20px;
+      display: flex;
+      gap: 8px;
     }
-    .categoria-item {
-      display: inline-block;
-      padding: 14px 20px;
+    .aba-mercado {
+      background: #f1f5f9;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
       font-weight: 600;
-      color: var(--texto-medio);
       cursor: pointer;
-      border-bottom: 3px solid transparent;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
-    .categoria-item.active {
-      color: var(--verde);
-      border-bottom-color: var(--verde);
-    }
-
-    .card-afeto {
-      background: #fef9e3;
-      border-radius: 28px;
-      padding: 24px;
-      margin: 30px 0;
-      border-left: 8px solid var(--amarelo);
-    }
-    .card-afeto h3 { font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
-    .pergunta-gratidao { font-size: 1.2rem; margin: 16px 0; }
-    .btn-afeto {
+    .aba-mercado.ativa {
       background: var(--verde);
       color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 60px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-right: 12px;
-      margin-top: 8px;
-      transition: 0.2s;
     }
-    .btn-respira { background: #F59E0B; }
+    .aba-mercado:hover:not(.ativa) { background: #e2e8f0; }
 
+    /* Grid produtos */
     .produtos-grid {
       display: grid;
       gap: 24px;
@@ -191,6 +159,16 @@
       font-size: 0.8rem;
       font-weight: 600;
     }
+    .foto-miniatura {
+      margin-top: 12px;
+      text-align: center;
+    }
+    .foto-miniatura img {
+      max-width: 100%;
+      max-height: 100px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
     .btn-card {
       background: var(--verde);
       color: white;
@@ -230,7 +208,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* TOAST */
+    /* Toast */
     #toast {
       position: fixed;
       bottom: 28px;
@@ -255,14 +233,92 @@
     #toast.toast-error { background: #721c24; }
     #toast.toast-info { background: #17a2b8; }
 
-    /* MODAIS (mesmos estilos anteriores) */
-    .modal-overlay, .modal-preco { /* mantido do original */ }
-    .modal-container, .modal-preco-content { /* mantido */ }
+    /* Modais */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-container {
+      background: white;
+      max-width: 600px;
+      width: 90%;
+      border-radius: 48px;
+      padding: 40px 32px;
+      text-align: center;
+      animation: fadeIn 0.3s;
+    }
+    .modo-opcoes { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin: 32px 0; }
+    .modo-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 16px 24px;
+      border-radius: 60px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 140px;
+    }
+    .modo-btn i { font-size: 1.8rem; display: block; margin-bottom: 8px; }
+    .modo-btn:hover { background: var(--verde); color: white; transform: scale(1.02); }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+    /* Modal envio */
+    .modal-preco {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      z-index: 2100;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-preco-content {
+      background: white;
+      max-width: 500px;
+      width: 90%;
+      border-radius: 32px;
+      padding: 28px;
+      position: relative;
+    }
+    .modal-preco-content h3 { margin-bottom: 20px; color: var(--verde); text-align: center; }
+    .modal-preco-content input, .modal-preco-content select, .modal-preco-content button {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 60px;
+      border: 1px solid var(--cinza-border);
+      font-size: 1rem;
+    }
+    .modal-preco-content button {
+      background: var(--verde);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    .foto-preview { width: 100%; margin-top: 12px; border-radius: 20px; display: none; }
+    .close-modal {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: var(--texto-medio);
+    }
+    .small-text { font-size: 0.7rem; color: var(--texto-medio); text-align: center; margin-top: 12px; }
   </style>
 </head>
 <body>
 
-<!-- TOAST -->
 <div id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
 
 <!-- MODAL DE ESCOLHA INICIAL -->
@@ -286,11 +342,11 @@
     <h3><i class="fas fa-camera"></i> Ajudar com preço</h3>
     <p id="infoProdutoMercado"></p>
     <input type="number" id="precoInput" step="0.01" placeholder="Preço (ex: 4,99)" required>
-    <label style="display:block; margin:8px 0 4px;">📸 Foto da etiqueta (obrigatória):</label>
+    <label>📸 Foto da etiqueta (obrigatória):</label>
     <input type="file" id="fotoInput" accept="image/*" capture="environment">
     <img id="fotoPreview" class="foto-preview" alt="Prévia da foto">
     <button id="btnEnviarPreco">Enviar preço e ajudar</button>
-    <p class="small-text" style="margin-top:12px; font-size:0.7rem;">A foto ajuda a validar o preço.</p>
+    <p class="small-text">A foto ajuda a validar o preço. Obrigado por colaborar!</p>
   </div>
 </div>
 
@@ -302,11 +358,8 @@
   </div>
 </header>
 
-<!-- MERCADOS -->
-<div class="mercados-strip" id="mercadosStrip"></div>
-
-<!-- CATEGORIAS -->
-<nav class="categorias-nav" id="categoriasNav"></nav>
+<!-- ABAS DE MERCADOS -->
+<div class="mercados-abas" id="mercadosAbas"></div>
 
 <div class="container">
   <!-- BANNER DO PROPÓSITO -->
@@ -315,7 +368,7 @@
     <p>Sabemos que ir ao mercado é um ato de amor — especialmente para quem cuida da família. Mas os preços mudam toda hora, e nem sempre dá para visitar vários mercados.</p>
     <p><strong>Aqui, quem ajuda é você!</strong> Ao tirar uma foto da etiqueta e enviar o preço, você ajuda <strong>sua mãe, seu avô, seus vizinhos</strong> a economizarem sem sair de casa. Cada contribuição é um gesto de cuidado.</p>
     <p>👉 <strong>Como funciona?</strong> Veja um produto, clique em "Ajudar com preço", tire a foto da etiqueta e informe o valor. Seu envio vira referência para todos. Juntos, fazemos o preço justo.</p>
-    <div id="statsContainer" class="stats-badge">📊 Carregando estatísticas...</div>
+    <div id="statsContainer" class="stats-badge">📊 Carregando...</div>
   </div>
 
   <!-- CARD DE AFETO (gratidão + respiração) -->
@@ -360,23 +413,20 @@
     el._t = setTimeout(() => { el.className = ''; }, 4000);
   }
 
-  // ========== UTILITÁRIO DE HORÁRIO ==========
+  // ========== HORÁRIO ==========
   function getProximaJanela() {
     const agora = new Date();
     const horaBrasilia = (agora.getUTCHours() - 3 + 24) % 24;
     if (horaBrasilia < 8) {
-      // Hoje ainda não começou a janela
       const hoje = new Date(agora);
-      hoje.setUTCHours(11, 0, 0, 0); // 8h BRT = 11h UTC
+      hoje.setUTCHours(11, 0, 0, 0);
       return { podeAgora: false, texto: `a partir das 8h de hoje`, timestamp: hoje.getTime() };
     } else if (horaBrasilia < 16) {
-      // Dentro da janela
       return { podeAgora: true, texto: `até as 16h de hoje` };
     } else {
-      // Após 16h, próxima janela amanhã às 8h
       const amanha = new Date(agora);
       amanha.setUTCDate(agora.getUTCDate() + 1);
-      amanha.setUTCHours(11, 0, 0, 0); // 8h BRT = 11h UTC
+      amanha.setUTCHours(11, 0, 0, 0);
       return { podeAgora: false, texto: `a partir das 8h de amanhã`, timestamp: amanha.getTime() };
     }
   }
@@ -384,10 +434,12 @@
   // ========== ESTADO GLOBAL ==========
   let todosProdutos = [];
   let todosMercados = [];
-  let categoriaAtual = 'todos';
-  let termoBusca = '';
+  let precosPorProdutoMercado = {}; // chave "produtoId|mercadoId" -> preco object
+  let mercadoAtivo = null; // null = menor preço global; senão id do mercado
   let ordenacao = 'menor_preco';
   let modoAtual = 'essencial';
+  let termoBusca = '';
+  let categoriaAtual = 'todos';
 
   // ========== FUNÇÕES DE COMUNICAÇÃO ==========
   async function fetchGET(action, params = {}) {
@@ -410,7 +462,6 @@
     return json;
   }
 
-  // ========== FUNÇÕES DE NEGÓCIO ==========
   async function listarProdutos() { return await fetchGET('produtos'); }
   async function listarMercados() { return await fetchGET('mercados'); }
   async function obterPrecoDestaque(produtoId, mercadoId) {
@@ -420,7 +471,7 @@
   }
   async function salvarPreco(dados) { return await fetchPOST('enviar_preco', dados); }
 
-  // ========== UPLOAD DE IMAGEM (IMG.BB) ==========
+  // ========== UPLOAD IMAGEM ==========
   function compressImage(base64, maxWidth = 800, quality = 0.7, callback) {
     const img = new Image();
     img.onload = () => {
@@ -459,37 +510,24 @@
     });
   }
 
-  // ========== GERENCIAMENTO DE MODO ==========
-  function carregarModo() {
-    const salvo = localStorage.getItem('precojusto_modo');
-    if (salvo && ['essencial', 'equilibrado', 'completo'].includes(salvo)) modoAtual = salvo;
-    else modoAtual = 'essencial';
-    aplicarModo();
-  }
-  function aplicarModo() {
-    document.body.classList.remove('modo-essencial', 'modo-equilibrado', 'modo-completo');
-    document.body.classList.add(`modo-${modoAtual}`);
-    localStorage.setItem('precojusto_modo', modoAtual);
-    if (todosProdutos.length) renderizarProdutos();
-  }
-  function abrirModalEscolha() { document.getElementById('modalEscolha').style.display = 'flex'; }
-  function fecharModalEIniciar(modo) {
-    modoAtual = modo; localStorage.setItem('precojusto_modo', modo); aplicarModo();
-    document.getElementById('modalEscolha').style.display = 'none';
-    inicializar();
-  }
-
-  // ========== INICIALIZAÇÃO ==========
-  async function inicializar() {
+  // ========== CARREGAR DADOS ==========
+  async function carregarDadosIniciais() {
     try {
       const [produtos, mercados] = await Promise.all([listarProdutos(), listarMercados()]);
       todosProdutos = produtos;
       todosMercados = mercados.filter(m => m.ativo);
-      renderizarMercados();
-      renderizarCategorias();
-      await carregarPrecos();
+      // Carrega todos os preços destaque
+      precosPorProdutoMercado = {};
+      for (const produto of todosProdutos) {
+        for (const mercado of todosMercados) {
+          const preco = await obterPrecoDestaque(produto.id, mercado.id);
+          if (preco) {
+            precosPorProdutoMercado[`${produto.id}|${mercado.id}`] = preco;
+          }
+        }
+      }
+      renderizarAbasMercados();
       renderizarProdutos();
-      configurarAfeto();
       atualizarStats();
     } catch (err) {
       console.error(err);
@@ -497,89 +535,108 @@
     }
   }
 
-  async function carregarPrecos() {
-    const container = document.getElementById('produtosContainer');
-    container.innerHTML = `<div class="loading-spinner"></div><p style="text-align:center;">Buscando preços colaborativos...</p>`;
+  function atualizarStats() {
     let produtosComPreco = 0;
     for (const produto of todosProdutos) {
-      let melhor = null;
-      let melhorPrecoValor = Infinity;
+      let tem = false;
       for (const mercado of todosMercados) {
-        const preco = await obterPrecoDestaque(produto.id, mercado.id);
-        if (preco && preco.preco < melhorPrecoValor) {
-          melhorPrecoValor = preco.preco;
-          melhor = { ...preco, mercado_nome: mercado.nome, mercado_logo: mercado.logo, mercado_cor: mercado.cor };
-        }
+        if (precosPorProdutoMercado[`${produto.id}|${mercado.id}`]) { tem = true; break; }
       }
-      produto.melhorPreco = melhor ? { resultados: [melhor] } : null;
-      produto.ultimaAtualizacao = melhor?.dataHora || null;
-      if (melhor) produtosComPreco++;
+      if (tem) produtosComPreco++;
     }
-    const algumaData = todosProdutos.find(p => p.ultimaAtualizacao);
-    if (algumaData) document.getElementById('ultimaAtualizacao').innerHTML = `Última atualização: ${new Date(algumaData.ultimaAtualizacao).toLocaleString('pt-BR')}`;
-    // Atualiza contador no banner
     const statsSpan = document.getElementById('statsContainer');
     if (statsSpan) statsSpan.innerHTML = `📊 ${produtosComPreco} de ${todosProdutos.length} produtos já têm preço cadastrado`;
   }
 
-  function atualizarStats() {
-    const produtosComPreco = todosProdutos.filter(p => p.melhorPreco !== null).length;
-    const statsSpan = document.getElementById('statsContainer');
-    if (statsSpan) statsSpan.innerHTML = `📊 ${produtosComPreco} de ${todosProdutos.length} produtos já têm preço cadastrado`;
-  }
-
-  function renderizarMercados() {
-    const strip = document.getElementById('mercadosStrip');
-    strip.innerHTML = `<div style="display:flex; gap:8px; flex-wrap:wrap;">${todosMercados.map(m => `<span class="mercado-chip">${m.logo || '🛒'} ${m.nome}</span>`).join('')}</div>`;
-  }
-
-  function renderizarCategorias() {
-    const cats = ['todos', ...new Set(todosProdutos.map(p => p.categoria))];
-    const nav = document.getElementById('categoriasNav');
-    nav.innerHTML = cats.map(c => `<span class="categoria-item ${c === categoriaAtual ? 'active' : ''}" data-cat="${c}">${c === 'todos' ? '📦 Todos' : c}</span>`).join('');
-    document.querySelectorAll('.categoria-item').forEach(el => {
-      el.addEventListener('click', () => {
-        categoriaAtual = el.getAttribute('data-cat');
-        renderizarCategorias();
+  // ========== ABAS DE MERCADOS ==========
+  function renderizarAbasMercados() {
+    const container = document.getElementById('mercadosAbas');
+    if (!container) return;
+    let html = `<button class="aba-mercado ${mercadoAtivo === null ? 'ativa' : ''}" data-mercado="">🌍 Todos os mercados (menor preço)</button>`;
+    todosMercados.forEach(m => {
+      html += `<button class="aba-mercado ${mercadoAtivo === m.id ? 'ativa' : ''}" data-mercado="${m.id}">${m.logo} ${m.nome}</button>`;
+    });
+    container.innerHTML = html;
+    document.querySelectorAll('.aba-mercado').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mercadoId = btn.dataset.mercado || null;
+        mercadoAtivo = mercadoId;
+        renderizarAbasMercados();
         renderizarProdutos();
       });
     });
   }
 
+  // ========== RENDERIZAÇÃO DOS PRODUTOS ==========
   function renderizarProdutos() {
     let filtrados = todosProdutos.filter(p => {
       if (categoriaAtual !== 'todos' && p.categoria !== categoriaAtual) return false;
       if (termoBusca && !p.nome_canonico.toLowerCase().includes(termoBusca.toLowerCase())) return false;
       return true;
     });
-    filtrados.sort((a,b) => {
-      const pa = a.melhorPreco?.resultados?.[0]?.preco || 999999;
-      const pb = b.melhorPreco?.resultados?.[0]?.preco || 999999;
-      return ordenacao === 'menor_preco' ? pa - pb : pb - pa;
+
+    // Para cada produto, determinar o preço a exibir (conforme mercadoAtivo)
+    const produtosComPreco = filtrados.map(produto => {
+      let precoInfo = null;
+      if (mercadoAtivo === null) {
+        // menor preço global
+        let melhorPreco = null;
+        let melhorMercado = null;
+        for (const mercado of todosMercados) {
+          const p = precosPorProdutoMercado[`${produto.id}|${mercado.id}`];
+          if (p && (!melhorPreco || p.preco < melhorPreco.preco)) {
+            melhorPreco = p;
+            melhorMercado = mercado;
+          }
+        }
+        if (melhorPreco) {
+          precoInfo = { ...melhorPreco, mercado_nome: melhorMercado.nome, mercado_logo: melhorMercado.logo, mercado_cor: melhorMercado.cor };
+        }
+      } else {
+        const p = precosPorProdutoMercado[`${produto.id}|${mercadoAtivo}`];
+        if (p) {
+          const mercado = todosMercados.find(m => m.id === mercadoAtivo);
+          precoInfo = { ...p, mercado_nome: mercado.nome, mercado_logo: mercado.logo, mercado_cor: mercado.cor };
+        }
+      }
+      return { produto, precoInfo };
     });
+
+    // Ordenação
+    if (ordenacao === 'menor_preco') {
+      produtosComPreco.sort((a,b) => (a.precoInfo?.preco || 999999) - (b.precoInfo?.preco || 999999));
+    } else {
+      produtosComPreco.sort((a,b) => (b.precoInfo?.preco || 0) - (a.precoInfo?.preco || 0));
+    }
+
     const container = document.getElementById('produtosContainer');
-    if (filtrados.length === 0) { container.innerHTML = `<div style="text-align:center; padding:60px;">Nenhum produto encontrado.</div>`; return; }
+    if (produtosComPreco.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:60px;">Nenhum produto encontrado.</div>`;
+      return;
+    }
+
     const isEssencial = modoAtual === 'essencial';
     const isCompleto = modoAtual === 'completo';
     const mostrarBotaoAjudar = (modoAtual === 'equilibrado' || modoAtual === 'completo');
-    const limite = isEssencial ? 15 : 30;
-    const html = `<div class="produtos-grid">${filtrados.slice(0, limite).map(produto => {
-      const melhor = produto.melhorPreco;
-      const temPreco = melhor && melhor.resultados?.length > 0;
-      const precoData = temPreco ? melhor.resultados[0] : null;
-      const precoStr = temPreco ? `R$ ${precoData.preco.toFixed(2).replace('.',',')}` : '--';
-      const mercadoNome = temPreco ? precoData.mercado_nome : 'Aguardando';
-      const dataPreco = precoData?.dataHora ? new Date(precoData.dataHora).toLocaleString('pt-BR') : '';
-      const precoUnidadeStr = temPreco && precoData.preco_por_unidade ? `R$ ${precoData.preco_por_unidade.toFixed(2).replace('.',',')}/${produto.unidade_medida || 'kg'}` : '';
+    const limite = isEssencial ? 15 : 60;
+
+    const html = `<div class="produtos-grid">${produtosComPreco.slice(0, limite).map(({ produto, precoInfo }) => {
+      const temPreco = precoInfo !== null;
+      const precoStr = temPreco ? `R$ ${precoInfo.preco.toFixed(2).replace('.',',')}` : '--';
+      const mercadoNome = temPreco ? precoInfo.mercado_nome : 'Aguardando';
+      const dataPreco = temPreco && precoInfo.dataHora ? new Date(precoInfo.dataHora).toLocaleString('pt-BR') : '';
+      const fotoUrl = temPreco ? precoInfo.fotoUrl : null;
+      const unidadeMedida = produto.unidade_medida || 'kg';
       return `
         <div class="produto-card">
           <div class="card-categoria">${produto.categoria}</div>
           <div class="card-nome">${produto.nome_canonico}</div>
           <div class="card-embalagem">${produto.embalagem}</div>
           ${temPreco ? `<div class="preco-grande">${precoStr}</div>` : `<div class="sem-preco">⏳ Aguardando primeiro preço</div>`}
-          ${isCompleto && temPreco && precoUnidadeStr ? `<div class="preco-unidade">${precoUnidadeStr}</div>` : ''}
+          ${isCompleto && temPreco ? `<div class="preco-unidade">R$ ${(precoInfo.preco / (parseFloat(produto.embalagem.match(/\d+(?:[.,]\d+)?/)?.[0] || 1)).toFixed(2).replace('.',',')}/${unidadeMedida}</div>` : ''}
           ${temPreco ? `<div style="margin: 6px 0; font-size:0.75rem;"><i class="fas fa-store"></i> ${mercadoNome}</div>` : ''}
           ${dataPreco ? `<div style="font-size:0.65rem; color:var(--texto-medio);"><i class="far fa-clock"></i> ${dataPreco}</div>` : ''}
+          ${fotoUrl ? `<div class="foto-miniatura"><a href="${fotoUrl}" target="_blank"><img src="${fotoUrl}" alt="Comprovante" loading="lazy"></a></div>` : ''}
           <button class="btn-card" onclick="window.location.href='produto.html?id=${produto.id}'">Ver detalhes</button>
           ${mostrarBotaoAjudar ? `<button class="btn-ajudar" data-produto='${JSON.stringify(produto)}' data-mercados='${JSON.stringify(todosMercados)}'>📸 Ajudar com preço</button>` : ''}
         </div>
@@ -596,13 +653,11 @@
     });
   }
 
-  // ========== MODAL DE ENVIO DE PREÇO ==========
+  // ========== MODAL DE ENVIO ==========
   let produtoSelecionado = null;
-  let mercadosDisponiveis = [];
 
   function abrirModalEnvio(produto, mercados) {
     produtoSelecionado = produto;
-    mercadosDisponiveis = mercados;
     const modal = document.getElementById('modalEnvioPreco');
     const info = document.getElementById('infoProdutoMercado');
     info.innerHTML = `<strong>${produto.nome_canonico}</strong><br>Escolha o mercado onde você viu:`;
@@ -662,13 +717,11 @@
         else msg += ` Próxima atualização permitida ${janela.texto}.`;
         toast(msg, 'success');
         document.getElementById('modalEnvioPreco').style.display = 'none';
-        await carregarPrecos();
-        renderizarProdutos();
-        atualizarStats();
+        // Recarrega dados
+        await carregarDadosIniciais();
       } else throw new Error(resultado.erro);
     } catch (err) {
       console.error(err);
-      // Se erro for de horário, mostra mensagem amigável
       if (err.message.includes('horário') || err.message.includes('8h') || err.message.includes('16h')) {
         const janela = getProximaJanela();
         toast(`⚠️ ${err.message} Próxima atualização permitida ${janela.texto}.`, 'error');
@@ -708,12 +761,33 @@
     });
   }
 
-  // ========== ORDENAÇÃO E BUSCA ==========
+  // ========== GERENCIAMENTO DE MODO ==========
+  function carregarModo() {
+    const salvo = localStorage.getItem('precojusto_modo');
+    if (salvo && ['essencial', 'equilibrado', 'completo'].includes(salvo)) modoAtual = salvo;
+    else modoAtual = 'essencial';
+    aplicarModo();
+  }
+  function aplicarModo() {
+    document.body.classList.remove('modo-essencial', 'modo-equilibrado', 'modo-completo');
+    document.body.classList.add(`modo-${modoAtual}`);
+    localStorage.setItem('precojusto_modo', modoAtual);
+    renderizarProdutos();
+  }
+  function abrirModalEscolha() { document.getElementById('modalEscolha').style.display = 'flex'; }
+  function fecharModalEIniciar(modo) {
+    modoAtual = modo; localStorage.setItem('precojusto_modo', modo); aplicarModo();
+    document.getElementById('modalEscolha').style.display = 'none';
+    carregarDadosIniciais();
+  }
+
+  // ========== EVENTOS ==========
   document.getElementById('ordenarBtn').addEventListener('click', () => {
     ordenacao = ordenacao === 'menor_preco' ? 'maior_preco' : 'menor_preco';
     document.getElementById('ordenarBtn').innerHTML = ordenacao === 'menor_preco' ? 'Menor preço' : 'Maior preço';
     renderizarProdutos();
   });
+
   const searchDiv = document.createElement('div');
   searchDiv.style.cssText = 'flex:1; max-width:400px;';
   searchDiv.innerHTML = `<input type="text" id="searchProduto" placeholder="🔍 Buscar produto..." style="width:100%; padding:12px 20px; border-radius:40px; border:none;">`;
@@ -723,16 +797,16 @@
     renderizarProdutos();
   });
 
-  // ========== EVENTOS DO MODAL DE ESCOLHA ==========
   document.querySelectorAll('.modo-btn').forEach(btn => {
     btn.addEventListener('click', (e) => fecharModalEIniciar(btn.getAttribute('data-modo')));
   });
   document.getElementById('btnLembrarEscolha').addEventListener('click', () => alert('Escolha um dos modos acima para continuar.'));
   document.getElementById('mudarModoBtn').addEventListener('click', abrirModalEscolha);
 
-  // ========== INÍCIO ==========
+  // ========== INICIALIZAÇÃO ==========
   if (!localStorage.getItem('precojusto_modo')) abrirModalEscolha();
-  else { carregarModo(); inicializar(); }
+  else { carregarModo(); carregarDadosIniciais(); }
+  configurarAfeto();
 </script>
 </body>
 </html>
