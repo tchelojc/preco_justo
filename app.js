@@ -10,7 +10,7 @@
  */
 
 // Use EXATAMENTE a URL que você acabou de testar
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwb4Ko1d1A-PLXCdqN9THv8jNz3_LlQIdjgpUiesfSxc8KdLn3lecEASmoPiVxX9zefEQ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx31xp2yYuA8NB_M4E1jjcOiDdB3lQsxoOv2tWyQqBJWXwUhmy89LD9fePyJipos_rjnQ/exec';
 
 // Fallback direto no GitHub (caso GAS esteja fora ou em deploy novo)
 const GITHUB_RAW = 'https://raw.githubusercontent.com/tchelojc/preco_justo/main/dados';
