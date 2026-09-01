@@ -169,6 +169,28 @@
       border-radius: 12px;
       cursor: pointer;
     }
+    /* 🔥 NOVO: quando o preço existe mas ninguém enviou foto ainda */
+    .foto-indisponivel {
+      margin-top: 12px;
+      text-align: center;
+      padding: 8px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: var(--texto-medio, #64748b);
+      font-size: 0.75rem;
+    }
+    .foto-indisponivel .btn-ajudar-foto {
+      display: inline-block;
+      margin-top: 4px;
+      background: none;
+      border: none;
+      color: var(--verde, #16a34a);
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
     .btn-card {
       background: var(--verde);
       color: white;
@@ -417,7 +439,53 @@
 <footer class="footer">
   <p>© 2026 Preço Justo · Juntos economizamos e cuidamos de quem amamos.</p>
   <p id="ultimaAtualizacao" style="margin-top:8px;"></p>
+  <p style="margin-top:10px;"><a href="#" id="linkAdminEncarte" style="color:#94a3b8; font-size:0.75rem; text-decoration:none;">⚙️ admin</a></p>
 </footer>
+
+<!-- 🔥 NOVO: ADMIN — extrair preços de encarte via IA -->
+<div id="modalAdminEncarte" class="modal-preco">
+  <div class="modal-preco-content" style="max-width:520px;">
+    <span class="close-modal" id="fecharModalAdminEncarte">&times;</span>
+    <h3><i class="fas fa-robot"></i> Atualizar preços por encarte (IA)</h3>
+    <p class="small-text">Escolha o mercado e a foto/print do encarte. A IA lê o encarte, casa cada item com o catálogo já cadastrado e envia os preços encontrados — usando o mesmo caminho de envio de preço que já existe (com foto = o próprio encarte).</p>
+
+    <label>Mercado do encarte:</label>
+    <select id="selectMercadoEncarte" style="width:100%; padding:12px; margin:8px 0; border-radius:12px;"></select>
+
+    <label>📸 Foto ou print do encarte:</label>
+    <input type="file" id="fotoEncarteInput" accept="image/*">
+    <img id="fotoEncartePreview" class="foto-preview" alt="Prévia do encarte">
+
+    <button id="btnExtrairEncarte" style="margin-top:10px;">🤖 Extrair preços com IA</button>
+    <div id="logExtracaoEncarte" style="margin-top:12px; max-height:220px; overflow-y:auto; font-size:0.8rem; text-align:left;"></div>
+
+    <p class="small-text" style="margin-top:12px; opacity:0.7;">Atualização automática às 7h, 12h e 18h ainda depende do backend do Preço Justo rodar a extração num gatilho agendado (Apps Script) — isso não está implementado aqui, só o botão manual. Ver aviso no chat.</p>
+  </div>
+</div>
+
+<script>
+  document.getElementById('linkAdminEncarte').addEventListener('click', (e) => {
+    e.preventDefault();
+    const senha = prompt('Senha de admin:');
+    if (senha !== 'SUBSTITUIR_SENHA_ADMIN') { alert('Senha incorreta.'); return; }
+    document.getElementById('modalAdminEncarte').style.display = 'flex';
+    listarMercados().then(mercados => {
+      const select = document.getElementById('selectMercadoEncarte');
+      select.innerHTML = mercados.filter(m => m.ativo).map(m => `<option value="${m.id}">${m.logo || ''} ${m.nome}</option>`).join('');
+    }).catch(() => {});
+  });
+  document.getElementById('fecharModalAdminEncarte').addEventListener('click', () => {
+    document.getElementById('modalAdminEncarte').style.display = 'none';
+  });
+  document.getElementById('fotoEncarteInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const preview = document.getElementById('fotoEncartePreview');
+    if (!file) { preview.style.display = 'none'; return; }
+    const reader = new FileReader();
+    reader.onload = ev => { preview.src = ev.target.result; preview.style.display = 'block'; };
+    reader.readAsDataURL(file);
+  });
+</script>
 
 <script>
   // ========== CONFIGURAÇÃO ==========
@@ -489,6 +557,115 @@
 
   async function listarProdutos() { return await fetchGET('produtos'); }
   async function listarMercados() { return await fetchGET('mercados'); }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🔥 NOVO: EXTRAÇÃO DE PREÇOS POR ENCARTE (IA) — admin
+  //
+  // ⚠️ AI_ATENDIMENTO_URL abaixo é um placeholder. "A mesma rota do
+  // almafluxo.uk do atendimento" ainda não foi me passada nesta conversa
+  // (é um servidor diferente do Boteco/8082 que já mexemos) — preciso da
+  // URL real e do formato de request/response esperado antes disso
+  // funcionar de verdade. O resto do fluxo (buscar catálogo, montar
+  // prompt, casar item por item, gravar preço) já está pronto e usa
+  // salvarPreco() — a MESMA função que o envio manual de preço já usa,
+  // então não depende de nenhuma ação nova no backend do Preço Justo.
+  // ═══════════════════════════════════════════════════════════════
+  const AI_ATENDIMENTO_URL = 'https://almafluxo.uk/proxy/SUBSTITUIR_PELA_ROTA_CERTA';
+
+  function montarPromptExtracaoEncarte(produtos) {
+    const catalogoResumido = produtos.map(p => `${p.id}: ${p.nome_canonico}`).join('\n');
+    return `Você vai analisar a imagem de um encarte de supermercado em anexo.
+Aqui está o catálogo de produtos já cadastrados (id: nome):
+${catalogoResumido}
+
+Tarefa: encontre no encarte os itens que correspondem a produtos deste catálogo (mesmo com nome escrito diferente no encarte) e o preço anunciado de cada um.
+
+Responda SOMENTE com um JSON válido, sem texto antes ou depois, no formato:
+[{"produtoId": "<id do catálogo>", "preco": <número, use ponto decimal>}]
+
+Se não encontrar nenhum item do catálogo no encarte, responda [].`;
+  }
+
+  async function chamarIAExtracaoEncarte(promptTexto, imagemBase64) {
+    // ⚠️ Formato de request ainda não confirmado — ajustar assim que a
+    // rota real do atendimento for informada.
+    const resp = await fetch(AI_ATENDIMENTO_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: promptTexto, imagem: imagemBase64 })
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status} na chamada da IA`);
+    const dados = await resp.json();
+    const textoResposta = dados.resposta || dados.texto || dados.result || '';
+    const match = textoResposta.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('IA não retornou um JSON reconhecível.');
+    return JSON.parse(match[0]);
+  }
+
+  function logExtracao(msg, tipo = 'info') {
+    const cores = { info: '#475569', ok: '#16a34a', erro: '#dc2626' };
+    const box = document.getElementById('logExtracaoEncarte');
+    const linha = document.createElement('div');
+    linha.style.color = cores[tipo] || cores.info;
+    linha.textContent = msg;
+    box.appendChild(linha);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  document.getElementById('btnExtrairEncarte').addEventListener('click', async () => {
+    const mercadoId = document.getElementById('selectMercadoEncarte').value;
+    const fotoFile = document.getElementById('fotoEncarteInput').files[0];
+    document.getElementById('logExtracaoEncarte').innerHTML = '';
+
+    if (!mercadoId) { logExtracao('⚠️ Selecione um mercado.', 'erro'); return; }
+    if (!fotoFile) { logExtracao('⚠️ Selecione a foto do encarte.', 'erro'); return; }
+
+    try {
+      logExtracao('⏳ Enviando encarte e catálogo pra IA...');
+      const [produtos, fotoUrlEncarte] = await Promise.all([
+        listarProdutos(),
+        uploadImageToHost(fotoFile, 1200, 0.8)
+      ]);
+
+      const reader = new FileReader();
+      const imagemBase64 = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(fotoFile);
+      });
+
+      const prompt = montarPromptExtracaoEncarte(produtos);
+      const itensEncontrados = await chamarIAExtracaoEncarte(prompt, imagemBase64);
+      logExtracao(`🧠 IA encontrou ${itensEncontrados.length} item(ns) no encarte.`);
+
+      let sucesso = 0, falha = 0;
+      for (const item of itensEncontrados) {
+        if (!item.produtoId || !item.preco) { falha++; continue; }
+        try {
+          const resultado = await salvarPreco({
+            produtoId: item.produtoId,
+            mercadoId,
+            preco: Number(item.preco),
+            fotoUrl: fotoUrlEncarte,
+            usuarioId: 'ia@precojusto',
+            usuarioNome: 'Robô Preço Justo (IA)'
+          });
+          if (resultado.ok) {
+            logExtracao(`✅ ${item.produtoId}: R$ ${item.preco}`, 'ok');
+            sucesso++;
+          } else {
+            throw new Error(resultado.erro || 'erro desconhecido');
+          }
+        } catch (e) {
+          logExtracao(`❌ ${item.produtoId}: ${e.message}`, 'erro');
+          falha++;
+        }
+      }
+      logExtracao(`Concluído: ${sucesso} preço(s) atualizado(s), ${falha} falha(s).`, sucesso ? 'ok' : 'erro');
+    } catch (e) {
+      logExtracao('❌ Erro no processo: ' + e.message, 'erro');
+    }
+  });
   
   // NOVA FUNÇÃO: busca todos os preços destaque de uma só vez
   async function listarTodosPrecosDestaque() {
@@ -690,7 +867,9 @@
           ${isCompleto && precoPorKg ? `<div class="preco-unidade">${precoPorKg}</div>` : ''}
           ${temPreco ? `<div style="margin: 6px 0; font-size:0.75rem;"><i class="fas fa-store"></i> ${mercadoNome}</div>` : ''}
           ${dataPreco ? `<div style="font-size:0.65rem; color:var(--texto-medio);"><i class="far fa-clock"></i> ${dataPreco}</div>` : ''}
-          ${fotoUrl ? `<div class="foto-miniatura"><a href="${fotoUrl}" target="_blank"><img src="${fotoUrl}" alt="Comprovante" loading="lazy"></a></div>` : ''}
+          ${fotoUrl
+            ? `<div class="foto-miniatura"><a href="${fotoUrl}" target="_blank"><img src="${fotoUrl}" alt="Comprovante" loading="lazy"></a></div>`
+            : (temPreco ? `<div class="foto-indisponivel">📷 Imagem não disponível${mostrarBotaoAjudar ? `<br><button class="btn-ajudar-foto" data-produto='${JSON.stringify(produto)}' data-mercados='${JSON.stringify(todosMercados)}'>Quer ajudar? Envie a foto</button>` : ''}</div>` : '')}
           <button class="btn-card" onclick="window.location.href='produto.html?id=${produto.id}'">Ver detalhes</button>
           ${mostrarBotaoAjudar ? `<button class="btn-ajudar" data-produto='${JSON.stringify(produto)}' data-mercados='${JSON.stringify(todosMercados)}'>📸 Ajudar com preço</button>` : ''}
         </div>
@@ -701,6 +880,16 @@
 
     document.querySelectorAll('.btn-ajudar').forEach(btn => {
       btn.addEventListener('click', (e) => {
+        const produto = JSON.parse(btn.dataset.produto);
+        const mercados = JSON.parse(btn.dataset.mercados);
+        abrirModalEnvio(produto, mercados);
+      });
+    });
+
+    // 🔥 NOVO: mesmo modal de envio, disparado a partir do aviso de "sem foto"
+    document.querySelectorAll('.btn-ajudar-foto').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const produto = JSON.parse(btn.dataset.produto);
         const mercados = JSON.parse(btn.dataset.mercados);
         abrirModalEnvio(produto, mercados);
